@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.0-flash',
     });
 
     const prompt = `You are a career advisor for BUE (British University in Egypt) students.

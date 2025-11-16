@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const text = await file.text();
 
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.0-flash',
     });
 
     const prompt = `Analyze this CV/Resume for a BUE (British University in Egypt) student and provide:
