@@ -3,211 +3,178 @@
 import { useEffect, useState } from 'react';
 import PathCard from './PathCard';
 import { CareerPath } from '@/types';
+import {
+  egyptianCareers,
+  categories,
+  getCareersByCategory,
+  searchCareers,
+  getAllJobs,
+  getAllPostgraduate,
+  type CareerOpportunity,
+} from '@/lib/data/egyptian-careers';
 
 interface ExplorerGridProps {
   searchQuery: string;
   filter: 'all' | 'job' | 'postgraduate';
 }
 
-// Mock data - will be replaced with Supabase queries
-const mockPaths: CareerPath[] = [
-  {
-    id: '1',
-    title: 'Software Engineer',
-    organization: 'Google',
-    type: 'job',
-    sector: 'Technology',
-    location: 'Remote',
-    salaryRange: { min: 80000, max: 150000, currency: 'USD' },
-    requiredSkills: [
-      { id: 's1', name: 'JavaScript', category: 'Programming', userHasSkill: true },
-      { id: 's2', name: 'React', category: 'Framework', userHasSkill: true },
-      { id: 's3', name: 'Node.js', category: 'Backend', userHasSkill: false },
-    ],
-    recommendedMajors: ['Computer Science', 'Software Engineering'],
-    description: 'Build scalable web applications and services',
-    remote: true,
-    experienceLevel: 'entry',
-    applicationUrl: 'https://careers.google.com',
+// Convert CareerOpportunity to CareerPath format
+function convertToCareerPath(career: CareerOpportunity): CareerPath {
+  return {
+    id: career.id,
+    title: career.title,
+    organization: career.organization,
+    logo: career.logo,
+    type: career.type,
+    sector: career.sector,
+    location: career.location,
+    salaryRange: career.salaryRange,
+    tuitionRange: career.tuitionRange,
+    requiredSkills: career.requiredSkills.map((skill, index) => ({
+      id: `${career.id}-skill-${index}`,
+      name: skill,
+      category: 'General',
+      userHasSkill: false,
+    })),
+    recommendedMajors: career.recommendedMajors,
+    description: career.description,
+    duration: career.duration,
+    experienceLevel: career.experienceLevel,
+    remote: career.remote,
+    applicationUrl: career.applicationUrl,
+    universityUrl: career.applicationUrl,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    title: 'MSc Data Science',
-    organization: 'University of Leeds',
-    type: 'postgraduate',
-    sector: 'Education',
-    location: 'Leeds, UK',
-    tuitionRange: { min: 25000, max: 30000, currency: 'GBP' },
-    requiredSkills: [
-      { id: 's4', name: 'Python', category: 'Programming', userHasSkill: true },
-      { id: 's5', name: 'Statistics', category: 'Math', userHasSkill: false },
-      { id: 's6', name: 'Machine Learning', category: 'AI', userHasSkill: false },
-    ],
-    recommendedMajors: ['Computer Science', 'Mathematics', 'Engineering'],
-    description: 'Advanced degree in data science and analytics',
-    duration: '1 year',
-    universityUrl: 'https://www.leeds.ac.uk',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    title: 'Marketing Associate',
-    organization: 'Unilever',
-    type: 'job',
-    sector: 'Consumer Goods',
-    location: 'Cairo, Egypt',
-    salaryRange: { min: 15000, max: 25000, currency: 'USD' },
-    requiredSkills: [
-      { id: 's7', name: 'Digital Marketing', category: 'Marketing', userHasSkill: true },
-      { id: 's8', name: 'SEO', category: 'Marketing', userHasSkill: false },
-      { id: 's9', name: 'Content Creation', category: 'Creative', userHasSkill: true },
-    ],
-    recommendedMajors: ['Marketing', 'Business', 'Communications'],
-    description: 'Drive brand awareness and customer engagement',
-    remote: false,
-    experienceLevel: 'entry',
-    applicationUrl: 'https://careers.unilever.com',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: '4',
-    title: 'Data Analyst',
-    organization: 'Microsoft',
-    type: 'job',
-    sector: 'Technology',
-    location: 'Remote',
-    salaryRange: { min: 70000, max: 120000, currency: 'USD' },
-    requiredSkills: [
-      { id: 's10', name: 'SQL', category: 'Database', userHasSkill: false },
-      { id: 's11', name: 'Excel', category: 'Tools', userHasSkill: true },
-      { id: 's12', name: 'Power BI', category: 'Visualization', userHasSkill: false },
-    ],
-    recommendedMajors: ['Computer Science', 'Business Analytics', 'Statistics'],
-    description: 'Transform data into actionable insights',
-    remote: true,
-    experienceLevel: 'entry',
-    applicationUrl: 'https://careers.microsoft.com',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: '5',
-    title: 'MBA in Innovation',
-    organization: 'Stanford University',
-    type: 'postgraduate',
-    sector: 'Education',
-    location: 'Stanford, USA',
-    tuitionRange: { min: 70000, max: 75000, currency: 'USD' },
-    requiredSkills: [
-      { id: 's13', name: 'Leadership', category: 'Soft Skills', userHasSkill: true },
-      { id: 's14', name: 'Strategic Thinking', category: 'Business', userHasSkill: false },
-      { id: 's15', name: 'Finance', category: 'Business', userHasSkill: false },
-    ],
-    recommendedMajors: ['Business', 'Engineering', 'Economics'],
-    description: 'Master business innovation and entrepreneurship',
-    duration: '2 years',
-    universityUrl: 'https://www.stanford.edu',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: '6',
-    title: 'UX Designer',
-    organization: 'Airbnb',
-    type: 'job',
-    sector: 'Technology',
-    location: 'San Francisco, USA',
-    salaryRange: { min: 90000, max: 140000, currency: 'USD' },
-    requiredSkills: [
-      { id: 's16', name: 'Figma', category: 'Design', userHasSkill: true },
-      { id: 's17', name: 'User Research', category: 'UX', userHasSkill: false },
-      { id: 's18', name: 'Prototyping', category: 'Design', userHasSkill: true },
-    ],
-    recommendedMajors: ['Design', 'HCI', 'Computer Science'],
-    description: 'Create delightful user experiences',
-    remote: false,
-    experienceLevel: 'mid',
-    applicationUrl: 'https://careers.airbnb.com',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+  };
+}
 
 export default function ExplorerGrid({ searchQuery, filter }: ExplorerGridProps) {
-  const [filteredPaths, setFilteredPaths] = useState<CareerPath[]>(mockPaths);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [displayedPaths, setDisplayedPaths] = useState<CareerPath[]>([]);
 
   useEffect(() => {
-    let results = mockPaths;
+    let results: CareerOpportunity[] = [];
+
+    // If there's a search query, search across all careers
+    if (searchQuery) {
+      results = searchCareers(searchQuery);
+    }
+    // If a specific category is selected, show only that category
+    else if (selectedCategory) {
+      results = getCareersByCategory(selectedCategory);
+    }
+    // Otherwise show all careers grouped by category
+    else {
+      results = [...egyptianCareers];
+    }
 
     // Apply type filter
     if (filter !== 'all') {
-      results = results.filter((path) => path.type === filter);
+      results = results.filter((career) => career.type === filter);
     }
 
-    // Apply search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      results = results.filter(
-        (path) =>
-          path.title.toLowerCase().includes(query) ||
-          path.organization.toLowerCase().includes(query) ||
-          path.sector.toLowerCase().includes(query) ||
-          path.requiredSkills.some((skill) => skill.name.toLowerCase().includes(query))
-      );
-    }
+    // Convert to CareerPath format
+    setDisplayedPaths(results.map(convertToCareerPath));
+  }, [searchQuery, filter, selectedCategory]);
 
-    setFilteredPaths(results);
-  }, [searchQuery, filter]);
-
-  const categories = [
-    {
-      title: 'Top Roles for Engineering Majors',
-      paths: filteredPaths.filter((p) =>
-        p.recommendedMajors.some(m => m.toLowerCase().includes('engineering') || m.toLowerCase().includes('computer'))
-      ),
-    },
-    {
-      title: 'Business & Management Pathways',
-      paths: filteredPaths.filter((p) =>
-        p.recommendedMajors.some(m => m.toLowerCase().includes('business') || m.toLowerCase().includes('marketing'))
-      ),
-    },
-    {
-      title: 'Global Postgraduate Programs',
-      paths: filteredPaths.filter((p) => p.type === 'postgraduate'),
-    },
-    {
-      title: 'Remote Career Opportunities',
-      paths: filteredPaths.filter((p) => p.type === 'job' && p.remote),
-    },
-  ];
+  // Group careers by category for display
+  const categorizedPaths = categories.map((category) => ({
+    title: category,
+    paths: displayedPaths.filter((path) => {
+      const originalCareer = egyptianCareers.find((c) => c.id === path.id);
+      return originalCareer?.category === category;
+    }),
+  }));
 
   return (
-    <div className="space-y-12">
-      {categories.map((category, index) => {
-        if (category.paths.length === 0) return null;
+    <div className="space-y-8">
+      {/* Category Pills - Only show when no search query */}
+      {!searchQuery && (
+        <div className="flex flex-wrap gap-3 mb-8">
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className={`px-6 py-2 rounded-full font-semibold transition-all ${
+              selectedCategory === null
+                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            All Categories
+          </button>
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-6 py-2 rounded-full font-semibold transition-all ${
+                selectedCategory === category
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      )}
 
-        return (
-          <div key={index} className="space-y-4">
-            <h2 className="text-2xl font-bold text-white">{category.title}</h2>
-            <div className="relative">
-              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
-                {category.paths.map((path) => (
-                  <PathCard key={path.id} path={path} />
-                ))}
+      {/* Results Count */}
+      <div className="text-gray-400 text-sm mb-4">
+        {displayedPaths.length} {displayedPaths.length === 1 ? 'opportunity' : 'opportunities'} found
+        {searchQuery && ` for "${searchQuery}"`}
+        {selectedCategory && !searchQuery && ` in ${selectedCategory}`}
+      </div>
+
+      {/* Category Sections */}
+      {selectedCategory === null && !searchQuery ? (
+        // Show all categories with horizontal scrolling
+        <div className="space-y-12">
+          {categorizedPaths.map((categoryGroup, index) => {
+            if (categoryGroup.paths.length === 0) return null;
+
+            return (
+              <div key={index} className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-white">{categoryGroup.title}</h2>
+                  <span className="text-gray-400 text-sm">
+                    {categoryGroup.paths.length} {categoryGroup.paths.length === 1 ? 'opportunity' : 'opportunities'}
+                  </span>
+                </div>
+                <div className="relative">
+                  <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
+                    {categoryGroup.paths.map((path) => (
+                      <PathCard key={path.id} path={path} />
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        );
-      })}
+            );
+          })}
+        </div>
+      ) : (
+        // Show filtered results in a grid
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {displayedPaths.map((path) => (
+            <PathCard key={path.id} path={path} />
+          ))}
+        </div>
+      )}
 
-      {filteredPaths.length === 0 && (
+      {/* No Results */}
+      {displayedPaths.length === 0 && (
         <div className="text-center py-16">
-          <p className="text-gray-400 text-lg">No results found. Try adjusting your search.</p>
+          <div className="text-6xl mb-4">🔍</div>
+          <p className="text-gray-400 text-lg mb-2">No opportunities found</p>
+          <p className="text-gray-500 text-sm">
+            Try adjusting your search or browse different categories
+          </p>
+          {selectedCategory && (
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+            >
+              View All Categories
+            </button>
+          )}
         </div>
       )}
     </div>
