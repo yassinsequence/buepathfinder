@@ -1,9 +1,9 @@
 'use client';
 
-import { CareerPath, JobListing, PostgraduateProgram } from '@/types';
-import { X, ExternalLink, Bookmark, Check, AlertCircle } from 'lucide-react';
-import { useEffect } from 'react';
-import Link from 'next/link';
+import { CareerPath } from '@/types';
+import { X, ExternalLink, Bookmark, Check, AlertCircle, BookOpen } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import CourseRecommendationsModal from './CourseRecommendationsModal';
 
 interface PathDetailModalProps {
   path: CareerPath;
@@ -12,6 +12,8 @@ interface PathDetailModalProps {
 }
 
 export default function PathDetailModal({ path, isOpen, onClose }: PathDetailModalProps) {
+  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -31,28 +33,29 @@ export default function PathDetailModal({ path, isOpen, onClose }: PathDetailMod
   const missingSkills = path.requiredSkills.filter((s) => !s.userHasSkill);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="bg-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-gray-700">
-        {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-br from-indigo-600 to-purple-600 p-6 border-b border-gray-700">
+    <>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          {/* Header */}
+          <div className="sticky top-0 bg-gradient-to-br from-amber-500 to-amber-600 p-6 border-b border-slate-700">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-semibold uppercase">
+                <span className="px-3 py-1 bg-slate-900/20 backdrop-blur-sm rounded-lg text-slate-900 text-sm font-semibold uppercase">
                   {path.type === 'job' ? 'Career Opportunity' : 'Postgraduate Program'}
                 </span>
-                <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-bold">
+                <span className="px-3 py-1 bg-slate-900/20 backdrop-blur-sm rounded-lg text-slate-900 text-sm font-bold">
                   {matchPercentage}% Match
                 </span>
               </div>
-              <h2 className="text-3xl font-bold text-white mb-2">{path.title}</h2>
-              <p className="text-xl text-white/90">{path.organization}</p>
+              <h2 className="text-3xl font-bold text-slate-900 mb-2">{path.title}</h2>
+              <p className="text-xl text-slate-800">{path.organization}</p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors"
+              className="p-2 hover:bg-slate-900/10 rounded-lg transition-colors"
             >
-              <X className="w-6 h-6 text-white" />
+              <X className="w-6 h-6 text-slate-900" />
             </button>
           </div>
         </div>
@@ -136,9 +139,7 @@ export default function PathDetailModal({ path, isOpen, onClose }: PathDetailMod
               {path.requiredSkills.map((skill) => (
                 <div
                   key={skill.id}
-                  className={`flex items-center justify-between p-3 rounded-lg ${
-                    skill.userHasSkill ? 'bg-green-500/10 border border-green-500/30' : 'bg-gray-800'
-                  }`}
+                  className={`flex items-center justify-between p-3 rounded-lg ${skill.userHasSkill ? 'bg-green-500/10 border border-green-500/30' : 'bg-slate-800 border border-slate-700'}`}
                 >
                   <div className="flex items-center gap-3">
                     {skill.userHasSkill ? (
@@ -154,7 +155,13 @@ export default function PathDetailModal({ path, isOpen, onClose }: PathDetailMod
                   {skill.userHasSkill ? (
                     <span className="text-green-400 text-sm font-semibold">You have this!</span>
                   ) : (
-                    <span className="text-yellow-400 text-sm font-semibold">Learn this</span>
+                    <button
+                      onClick={() => setSelectedSkill(skill.name)}
+                      className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-lg text-sm font-semibold transition-colors"
+                    >
+                      <BookOpen className="w-4 h-4" />
+                      Learn this
+                    </button>
                   )}
                 </div>
               ))}
@@ -169,19 +176,8 @@ export default function PathDetailModal({ path, isOpen, onClose }: PathDetailMod
                 <div className="flex-1">
                   <h4 className="text-yellow-400 font-semibold mb-2">Skill Gap Analysis</h4>
                   <p className="text-gray-300 mb-3">
-                    You already have {skillsMatch} out of {totalSkills} required skills ({matchPercentage}
-                    % match). Consider learning these skills to strengthen your fit:
+                    You already have {skillsMatch} out of {totalSkills} required skills ({matchPercentage}% match). Click "Learn this" on any skill above to get personalized course recommendations.
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    {missingSkills.map((skill) => (
-                      <span
-                        key={skill.id}
-                        className="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-sm"
-                      >
-                        {skill.name}
-                      </span>
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>
@@ -189,7 +185,7 @@ export default function PathDetailModal({ path, isOpen, onClose }: PathDetailMod
 
           {/* Action Buttons */}
           <div className="flex gap-4 pt-4">
-            <button className="flex-1 flex items-center justify-center gap-2 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors">
+            <button className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-700 hover:bg-slate-600 border border-slate-600 text-white rounded-lg font-semibold transition-colors">
               <Bookmark className="w-5 h-5" />
               Save to Dashboard
             </button>
@@ -198,23 +194,25 @@ export default function PathDetailModal({ path, isOpen, onClose }: PathDetailMod
                 href={path.applicationUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-lg font-semibold transition-colors"
               >
                 <ExternalLink className="w-5 h-5" />
                 {path.type === 'job' ? 'View Job Opening' : 'Visit University'}
               </a>
             )}
-            {missingSkills.length > 0 && (
-              <Link
-                href="/learn"
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors"
-              >
-                Learn Missing Skills
-              </Link>
-            )}
           </div>
         </div>
       </div>
     </div>
+
+    {/* Course Recommendations Modal */}
+    {selectedSkill && (
+      <CourseRecommendationsModal
+        skillName={selectedSkill}
+        isOpen={!!selectedSkill}
+        onClose={() => setSelectedSkill(null)}
+      />
+    )}
+  </>
   );
 }

@@ -22,39 +22,56 @@ export async function POST(request: NextRequest) {
       model: 'gemini-2.0-flash',
     });
 
-    const prompt = `Analyze this CV/Resume for a BUE (British University in Egypt) student and provide:
+    const prompt = `Analyze this CV/Resume for a BUE (British University in Egypt) student.
 
 CV Content:
 ${text}
 
-Please provide:
-1. **Skills Identified**: List all technical and soft skills found
+Provide a response in this EXACT JSON format (no markdown, just pure JSON):
+{
+  "summary": "A single concise paragraph (3-4 sentences) summarizing their profile, strengths, and career direction",
+  "skills": ["skill1", "skill2", "skill3"],
+  "careerLevel": "entry/mid/senior",
+  "recommendedJobIds": ["eng-1", "eng-4", "bus-1"]
+}
 
-2. **Career Level**: Entry/Mid/Senior level assessment
+The recommendedJobIds should match opportunities from these Egyptian companies:
+- Engineering & Tech: Vodafone Egypt (eng-1), IBM (eng-3), Instabug (eng-4), Fawry (eng-5), Etisalat (eng-6)
+- Business: KPMG (bus-1), CIB (bus-2), PwC (bus-3)
+- Creative: Vezeeta (cre-1), Leo Burnett (cre-2), Tamatem (cre-4)
+- Medical: Cleopatra Hospitals (med-1), Vacsera (med-2), GSK (med-4)
+- Law: Shalakany (law-1), NBE (law-2), Juhayna (law-4)
+- Remote: Andela (rem-1), Paymob (rem-2), Udacity (rem-3)
+- Marketing: Jumia (mar-1), Unilever (mar-2), Schneider (mar-3)
 
-3. **Recommended Jobs in Egypt**: Suggest 5 job opportunities that match this profile from companies like:
-   - Vodafone Egypt, Orange Egypt, Etisalat
-   - IBM Egypt, Microsoft Egypt, Dell
-   - Egyptian startups and tech companies
-   - Multinational companies with Egypt offices
-   (Mention these can be found on Wuzzuf, Forasna, LinkedIn Egypt)
-
-4. **Skill Gaps**: What skills are missing for top roles in their field in the Egyptian job market
-
-5. **Learning Recommendations**: Specific courses from:
-   - Coursera
-   - Edraak (Arabic platform)
-   - Maharat Google
-   - LinkedIn Learning
-   - Local Egyptian training centers
-
-Format the response clearly with headings and bullet points. Include realistic salary expectations in EGP.`;
+Choose 3-5 most relevant job IDs based on their background.`;
 
     const result = await model.generateContent(prompt);
     const response = result.response;
-    const analysis = response.text();
+    const analysisText = response.text();
 
-    return NextResponse.json({ analysis });
+    // Parse the JSON response
+    let analysisData;
+    try {
+      // Remove markdown code blocks if present
+      const cleanText = analysisText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      analysisData = JSON.parse(cleanText);
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', analysisText);
+      // Fallback to raw text
+      analysisData = {
+        summary: analysisText,
+        skills: [],
+        careerLevel: 'entry',
+        recommendedJobIds: []
+      };
+    }
+
+    return NextResponse.json({
+      analysis: analysisData,
+      cvText: text,
+      fileName: file.name
+    });
 
   } catch (error: any) {
     console.error('CV Upload API error:', error);

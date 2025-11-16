@@ -2,13 +2,16 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Upload, FileText, Loader2, CheckCircle } from 'lucide-react';
+import { saveUserProfile } from '@/lib/storage/userProfile';
 
 export default function UploadCVPage() {
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [analysis, setAnalysis] = useState<string>('');
+  const [summary, setSummary] = useState<string>('');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -35,22 +38,38 @@ export default function UploadCVPage() {
       const data = await response.json();
 
       if (data.analysis) {
-        setAnalysis(data.analysis);
+        // Save to localStorage
+        saveUserProfile({
+          cvText: data.cvText,
+          cvFileName: data.fileName,
+          cvUploadedAt: new Date().toISOString(),
+          skills: data.analysis.skills || [],
+          careerLevel: data.analysis.careerLevel || 'entry',
+          aiSummary: data.analysis.summary || '',
+          recommendedJobIds: data.analysis.recommendedJobIds || [],
+        });
+
+        setSummary(data.analysis.summary || data.analysis);
         setUploadStatus('success');
       } else {
         throw new Error('No analysis returned');
       }
     } catch (error) {
+      console.error('Upload error:', error);
       setUploadStatus('error');
     } finally {
       setIsUploading(false);
     }
   };
 
+  const goToDashboard = () => {
+    router.push('/dashboard');
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
-      <header className="bg-black/50 backdrop-blur-sm border-b border-gray-700">
+      <header className="bg-slate-900/95 backdrop-blur-sm border-b border-slate-700">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <Link
@@ -61,7 +80,7 @@ export default function UploadCVPage() {
               Back to Home
             </Link>
             <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <Upload className="w-6 h-6 text-orange-400" />
+              <Upload className="w-6 h-6 text-amber-500" />
               Upload Your CV
             </h1>
           </div>
@@ -70,13 +89,13 @@ export default function UploadCVPage() {
 
       {/* Upload Container */}
       <div className="container mx-auto px-4 py-12 max-w-4xl">
-        <div className="bg-gray-800 rounded-2xl shadow-2xl border border-gray-700 p-8">
+        <div className="bg-slate-800 border border-slate-700 rounded-xl shadow-xl p-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-white mb-4">
-              Let AI Analyze Your CV
+              Get AI-Powered Career Insights
             </h2>
             <p className="text-gray-300 text-lg">
-              Upload your CV and get personalized career recommendations, skill gap analysis, and learning path suggestions
+              Upload your CV to receive personalized recommendations and save it to your dashboard
             </p>
           </div>
 
@@ -84,7 +103,7 @@ export default function UploadCVPage() {
           <div className="mb-8">
             <label
               htmlFor="cv-upload"
-              className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-600 rounded-xl cursor-pointer hover:border-orange-500 hover:bg-gray-700/50 transition-all"
+              className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-slate-600 rounded-xl cursor-pointer hover:border-amber-500 hover:bg-slate-700/50 transition-all"
             >
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <Upload className="w-16 h-16 text-gray-400 mb-4" />
@@ -92,14 +111,14 @@ export default function UploadCVPage() {
                   {file ? file.name : 'Click to upload or drag and drop'}
                 </p>
                 <p className="text-sm text-gray-400">
-                  PDF, DOC, DOCX (MAX. 5MB)
+                  PDF, DOC, DOCX, TXT (MAX. 5MB)
                 </p>
               </div>
               <input
                 id="cv-upload"
                 type="file"
                 className="hidden"
-                accept=".pdf,.doc,.docx"
+                accept=".pdf,.doc,.docx,.txt"
                 onChange={handleFileChange}
               />
             </label>
@@ -111,7 +130,7 @@ export default function UploadCVPage() {
               <button
                 onClick={handleUpload}
                 disabled={isUploading}
-                className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-full font-bold hover:from-orange-600 hover:to-red-700 transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-3 px-8 py-4 bg-amber-500 text-slate-900 rounded-lg font-semibold hover:bg-amber-400 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isUploading ? (
                   <>
@@ -130,20 +149,26 @@ export default function UploadCVPage() {
 
           {/* Success Message */}
           {uploadStatus === 'success' && (
-            <div className="bg-green-500/20 border border-green-500 rounded-xl p-6 mb-6">
+            <div className="bg-green-500/10 border border-green-500/50 rounded-xl p-6 mb-6">
               <div className="flex items-center gap-3 mb-4">
                 <CheckCircle className="w-6 h-6 text-green-400" />
                 <h3 className="text-xl font-bold text-green-400">CV Analyzed Successfully!</h3>
               </div>
-              <div className="text-gray-200 whitespace-pre-wrap leading-relaxed">
-                {analysis}
-              </div>
+              <p className="text-gray-200 leading-relaxed mb-4">
+                {summary}
+              </p>
+              <button
+                onClick={goToDashboard}
+                className="px-6 py-3 bg-amber-500 text-slate-900 rounded-lg font-semibold hover:bg-amber-400 transition-colors"
+              >
+                View in Dashboard →
+              </button>
             </div>
           )}
 
           {/* Error Message */}
           {uploadStatus === 'error' && (
-            <div className="bg-red-500/20 border border-red-500 rounded-xl p-6">
+            <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-6">
               <p className="text-red-400">
                 Failed to analyze CV. Please try again.
               </p>
@@ -152,22 +177,22 @@ export default function UploadCVPage() {
 
           {/* Features List */}
           <div className="grid md:grid-cols-3 gap-4 mt-8">
-            <div className="bg-gray-700 p-4 rounded-xl">
-              <h4 className="font-semibold text-white mb-2">Skill Extraction</h4>
+            <div className="bg-slate-700/50 border border-slate-600 p-4 rounded-xl">
+              <h4 className="font-semibold text-white mb-2">Profile Analysis</h4>
               <p className="text-gray-300 text-sm">
-                AI identifies all your skills and experience
+                AI analyzes your skills and experience level
               </p>
             </div>
-            <div className="bg-gray-700 p-4 rounded-xl">
-              <h4 className="font-semibold text-white mb-2">Career Matching</h4>
+            <div className="bg-slate-700/50 border border-slate-600 p-4 rounded-xl">
+              <h4 className="font-semibold text-white mb-2">Personalized Matches</h4>
               <p className="text-gray-300 text-sm">
-                Find jobs that match your profile
+                Get tailored Egyptian job recommendations
               </p>
             </div>
-            <div className="bg-gray-700 p-4 rounded-xl">
-              <h4 className="font-semibold text-white mb-2">Gap Analysis</h4>
+            <div className="bg-slate-700/50 border border-slate-600 p-4 rounded-xl">
+              <h4 className="font-semibold text-white mb-2">Dashboard Access</h4>
               <p className="text-gray-300 text-sm">
-                Discover skills you need to learn
+                Your CV is saved for future reference
               </p>
             </div>
           </div>

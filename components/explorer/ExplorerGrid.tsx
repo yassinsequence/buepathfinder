@@ -8,10 +8,10 @@ import {
   categories,
   getCareersByCategory,
   searchCareers,
-  getAllJobs,
-  getAllPostgraduate,
   type CareerOpportunity,
 } from '@/lib/data/egyptian-careers';
+import { getUserProfile } from '@/lib/storage/userProfile';
+import { Star } from 'lucide-react';
 
 interface ExplorerGridProps {
   searchQuery: string;
@@ -51,8 +51,18 @@ function convertToCareerPath(career: CareerOpportunity): CareerPath {
 export default function ExplorerGrid({ searchQuery, filter }: ExplorerGridProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [displayedPaths, setDisplayedPaths] = useState<CareerPath[]>([]);
+  const [recommendedPaths, setRecommendedPaths] = useState<CareerPath[]>([]);
 
   useEffect(() => {
+    // Get user profile and recommended jobs
+    const profile = getUserProfile();
+    if (profile && profile.recommendedJobIds) {
+      const recommended = egyptianCareers
+        .filter(career => profile.recommendedJobIds.includes(career.id))
+        .map(convertToCareerPath);
+      setRecommendedPaths(recommended);
+    }
+
     let results: CareerOpportunity[] = [];
 
     // If there's a search query, search across all careers
@@ -93,10 +103,10 @@ export default function ExplorerGrid({ searchQuery, filter }: ExplorerGridProps)
         <div className="flex flex-wrap gap-3 mb-8">
           <button
             onClick={() => setSelectedCategory(null)}
-            className={`px-6 py-2 rounded-full font-semibold transition-all ${
+            className={`px-6 py-2 rounded-lg font-medium transition-all ${
               selectedCategory === null
-                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                ? 'bg-amber-500 text-slate-900 shadow-lg'
+                : 'bg-slate-800 text-gray-300 hover:bg-slate-700 border border-slate-700'
             }`}
           >
             All Categories
@@ -105,10 +115,10 @@ export default function ExplorerGrid({ searchQuery, filter }: ExplorerGridProps)
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-6 py-2 rounded-full font-semibold transition-all ${
+              className={`px-6 py-2 rounded-lg font-medium transition-all ${
                 selectedCategory === category
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                  ? 'bg-amber-500 text-slate-900 shadow-lg'
+                  : 'bg-slate-800 text-gray-300 hover:bg-slate-700 border border-slate-700'
               }`}
             >
               {category}
@@ -123,6 +133,24 @@ export default function ExplorerGrid({ searchQuery, filter }: ExplorerGridProps)
         {searchQuery && ` for "${searchQuery}"`}
         {selectedCategory && !searchQuery && ` in ${selectedCategory}`}
       </div>
+
+      {/* Recommended for You Section */}
+      {recommendedPaths.length > 0 && !searchQuery && !selectedCategory && (
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-4">
+            <Star className="w-6 h-6 text-amber-500 fill-amber-500" />
+            <h2 className="text-2xl font-bold text-white">Recommended for You</h2>
+            <span className="text-gray-400 text-sm">Based on your CV</span>
+          </div>
+          <div className="relative">
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
+              {recommendedPaths.map((path) => (
+                <PathCard key={path.id} path={path} />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Category Sections */}
       {selectedCategory === null && !searchQuery ? (
