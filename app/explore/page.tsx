@@ -14,7 +14,7 @@ export default function ExplorePage() {
       <header className="sticky top-0 z-50 bg-black/95 backdrop-blur-sm border-b border-gray-800">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-white">PathFinder AI</h1>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">BUE PathFinder</h1>
 
             {/* Search Bar */}
             <div className="flex-1 max-w-2xl mx-8">

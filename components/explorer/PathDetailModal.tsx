@@ -3,6 +3,7 @@
 import { CareerPath, JobListing, PostgraduateProgram } from '@/types';
 import { X, ExternalLink, Bookmark, Check, AlertCircle } from 'lucide-react';
 import { useEffect } from 'react';
+import Link from 'next/link';
 
 interface PathDetailModalProps {
   path: CareerPath;
@@ -204,9 +205,12 @@ export default function PathDetailModal({ path, isOpen, onClose }: PathDetailMod
               </a>
             )}
             {missingSkills.length > 0 && (
-              <button className="flex-1 flex items-center justify-center gap-2 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors">
+              <Link
+                href="/learn"
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors"
+              >
                 Learn Missing Skills
-              </button>
+              </Link>
             )}
           </div>
         </div>
