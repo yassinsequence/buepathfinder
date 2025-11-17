@@ -162,7 +162,7 @@ export const careerPaths: CareerPathCategory[] = [
   },
 ];
 
-// Calculate match score based on user profile
+// Calculate match score based on user profile - improved algorithm
 export function calculatePathMatch(
   path: CareerPathCategory,
   userSkills: string[],
@@ -173,31 +173,78 @@ export function calculatePathMatch(
   }
 
   let score = 0;
-  let totalPossible = 0;
 
-  // Skill matching (70% weight)
+  // Skill matching (50% weight) - more lenient fuzzy matching
   if (userSkills.length > 0) {
-    totalPossible += 70;
-    const matchedSkills = path.requiredSkills.filter(skill =>
-      userSkills.some(userSkill =>
-        skill.toLowerCase().includes(userSkill.toLowerCase()) ||
-        userSkill.toLowerCase().includes(skill.toLowerCase())
-      )
-    );
-    score += (matchedSkills.length / path.requiredSkills.length) * 70;
+    const matchedSkills = path.requiredSkills.filter(pathSkill => {
+      return userSkills.some(userSkill => {
+        const pathSkillLower = pathSkill.toLowerCase();
+        const userSkillLower = userSkill.toLowerCase();
+
+        // Exact match
+        if (pathSkillLower === userSkillLower) return true;
+
+        // Contains match (either direction)
+        if (pathSkillLower.includes(userSkillLower) || userSkillLower.includes(pathSkillLower)) {
+          return true;
+        }
+
+        // Word overlap (e.g., "Project Management" matches "Management")
+        const pathWords = pathSkillLower.split(/\s+/);
+        const userWords = userSkillLower.split(/\s+/);
+        return pathWords.some(pw => userWords.some(uw =>
+          pw.length > 3 && uw.length > 3 && (pw.includes(uw) || uw.includes(pw))
+        ));
+      });
+    });
+
+    score += (matchedSkills.length / path.requiredSkills.length) * 50;
   }
 
-  // Interest/keyword matching (30% weight)
+  // Interest matching (30% weight) - check against path name, description, and skills
   if (userInterests.length > 0) {
-    totalPossible += 30;
-    const pathKeywords = [path.name, path.description, ...path.requiredSkills].join(' ').toLowerCase();
-    const matchedInterests = userInterests.filter(interest =>
-      pathKeywords.includes(interest.toLowerCase())
-    );
-    score += (matchedInterests.length / Math.max(userInterests.length, 1)) * 30;
+    const pathText = [
+      path.name,
+      path.description,
+      ...path.requiredSkills,
+      ...path.facultyAlignment
+    ].join(' ').toLowerCase();
+
+    const matchedInterests = userInterests.filter(interest => {
+      const interestLower = interest.toLowerCase();
+      return pathText.includes(interestLower) ||
+             interestLower.split(/\s+/).some(word =>
+               word.length > 3 && pathText.includes(word)
+             );
+    });
+
+    score += (matchedInterests.length / userInterests.length) * 30;
   }
 
-  return totalPossible > 0 ? Math.round(score) : 0;
+  // Keyword boost (20% weight) - check for domain-specific keywords
+  const domainKeywords: Record<string, string[]> = {
+    'software-tech': ['software', 'programming', 'developer', 'code', 'tech', 'computer', 'web', 'app', 'data', 'ai', 'ml'],
+    'industrial-engineering': ['mechanical', 'civil', 'electrical', 'engineering', 'cad', 'design', 'manufacturing', 'construction'],
+    'sustainability': ['environment', 'energy', 'renewable', 'sustainability', 'green', 'climate', 'solar', 'wind'],
+    'business-finance': ['business', 'finance', 'accounting', 'economics', 'banking', 'investment', 'consulting', 'strategy'],
+    'media-marketing': ['marketing', 'advertising', 'media', 'social', 'content', 'brand', 'pr', 'communications'],
+    'creative-design': ['design', 'graphic', 'ux', 'ui', 'creative', 'art', 'visual', 'photoshop', 'figma'],
+    'research-education': ['research', 'teaching', 'education', 'academic', 'professor', 'study', 'learning'],
+    'legal-compliance': ['law', 'legal', 'compliance', 'regulatory', 'lawyer', 'attorney', 'contracts'],
+    'healthcare-clinical': ['healthcare', 'medical', 'clinical', 'hospital', 'patient', 'nursing', 'dentist'],
+    'pharma-biotech': ['pharmacy', 'pharmaceutical', 'biotech', 'drug', 'medicine', 'clinical'],
+    'rehabilitation': ['physiotherapy', 'rehabilitation', 'therapy', 'physical', 'sports medicine', 'wellness'],
+  };
+
+  const pathKeywords = domainKeywords[path.id] || [];
+  const allUserText = [...userSkills, ...userInterests].join(' ').toLowerCase();
+  const matchedKeywords = pathKeywords.filter(keyword => allUserText.includes(keyword));
+
+  if (pathKeywords.length > 0) {
+    score += (matchedKeywords.length / pathKeywords.length) * 20;
+  }
+
+  return Math.min(Math.round(score), 100);
 }
 
 export function getSortedPathsByMatch(

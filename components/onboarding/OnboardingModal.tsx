@@ -23,8 +23,10 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
   const [experienceLevel, setExperienceLevel] = useState('entry');
 
   const availableInterests = [
-    'Technology', 'Business', 'Design', 'Marketing', 'Engineering',
-    'Healthcare', 'Law', 'Education', 'Sales', 'Research'
+    'Software Development', 'Data Science', 'Mechanical Engineering', 'Civil Engineering',
+    'Renewable Energy', 'Business Strategy', 'Finance & Banking', 'Digital Marketing',
+    'Graphic Design', 'UX/UI Design', 'Healthcare', 'Pharmacy', 'Dentistry',
+    'Legal & Compliance', 'Research', 'Teaching', 'Sustainability'
   ];
 
   if (!isOpen) return null;
@@ -66,6 +68,10 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
           careerLevel: data.analysis.careerLevel || 'entry',
           aiSummary: data.analysis.summary || data.analysis,
           recommendedJobIds: data.analysis.recommendedJobIds || [],
+          interests: data.analysis.interests || [],
+          major: data.analysis.major || '',
+          experience: data.analysis.experience || [],
+          careerPaths: data.analysis.careerPaths || [],
         });
 
         onClose();

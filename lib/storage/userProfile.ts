@@ -9,6 +9,10 @@ export interface UserProfile {
   careerLevel: string;
   aiSummary: string;
   recommendedJobIds: string[];
+  interests?: string[];
+  major?: string;
+  experience?: string[];
+  careerPaths?: string[];
 }
 
 const PROFILE_KEY = 'bue_pathfinder_profile';

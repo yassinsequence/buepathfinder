@@ -25,7 +25,7 @@ export default function ExplorePage() {
     // Get user profile for matching
     const profile = getUserProfile();
     const userSkills = profile?.skills || [];
-    const userInterests = profile?.skills || []; // Using skills as interests for now
+    const userInterests = profile?.interests || profile?.skills || [];
 
     // Get paths sorted by match score
     const sortedPaths = getSortedPathsByMatch(userSkills, userInterests);
