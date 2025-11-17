@@ -1,6 +1,8 @@
 // 3-Layer Career Exploration Structure for BUE Students
 // Layer 1: Sectors → Layer 2: Functions/Roles → Layer 3: Jobs
 
+export type PayTier = '$' | '$$' | '$$$';
+
 export interface CareerSector {
   id: string;
   name: string;
@@ -12,7 +14,7 @@ export interface CareerSector {
   skillsNeeded: string[];
   functions: CareerFunction[];
   facultyAlignment: string[];
-  salaryRange: { min: number; max: number; currency: string };
+  typicalPay: PayTier;
 }
 
 export interface CareerFunction {
@@ -24,10 +26,15 @@ export interface CareerFunction {
   careerPath: string;
   requiredSkills: string[];
   typicalTitles: string[];
-  salaryRange: { min: number; max: number; currency: string };
+  typicalPay: PayTier;
   jobIds: string[]; // References to actual job postings
   growthOpportunities: string;
 }
+
+// Pay tier guide:
+// $ = Entry-level (8K-18K EGP)
+// $$ = Mid-level (18K-35K EGP)
+// $$$ = Senior/High-paying (35K+ EGP)
 
 export const careerSectors: CareerSector[] = [
   {
@@ -40,7 +47,7 @@ export const careerSectors: CareerSector[] = [
     whyThisSector: 'If you love numbers, strategic thinking, and making high-stakes decisions that shape economies, investment is where theory meets real-world impact. Every day brings new challenges in a fast-paced, intellectually stimulating environment.',
     skillsNeeded: ['Financial Modeling', 'Excel', 'Valuation', 'Market Analysis', 'Presentation Skills', 'Attention to Detail'],
     facultyAlignment: ['Business Administration, Economics & Political Science'],
-    salaryRange: { min: 18000, max: 50000, currency: 'EGP' },
+    typicalPay: '$$$',
     functions: [
       {
         id: 'investment-banking',
@@ -51,9 +58,9 @@ export const careerSectors: CareerSector[] = [
         careerPath: 'Analyst (2-3 years) → Associate (2-3 years) → VP (3-4 years) → Director → Managing Director. Many pivot to private equity, hedge funds, or corporate development after 2-5 years.',
         requiredSkills: ['Financial Modeling', 'PowerPoint', 'Excel', 'Valuation (DCF, Comps)', 'Deal Structuring', 'Client Management'],
         typicalTitles: ['Investment Banking Analyst', 'IB Associate', 'M&A Analyst', 'Corporate Finance Associate'],
-        salaryRange: { min: 25000, max: 50000, currency: 'EGP' },
+        typicalPay: '$$$',
         jobIds: ['bus-3'],
-        growthOpportunities: 'Exit to PE/VC, corporate development, or stay for VP+ track with multimillion-dollar compensation.',
+        growthOpportunities: 'Exit to PE/VC, corporate development, or stay for VP+ track with significant compensation upside.',
       },
       {
         id: 'private-equity',
@@ -64,9 +71,9 @@ export const careerSectors: CareerSector[] = [
         careerPath: 'Typically requires 2-3 years IB experience first. PE Associate → Senior Associate → VP → Principal → Partner. Long-term partnership track is lucrative but competitive.',
         requiredSkills: ['LBO Modeling', 'Due Diligence', 'Value Creation', 'Operations Strategy', 'Negotiation', 'Portfolio Management'],
         typicalTitles: ['PE Associate', 'Investment Associate', 'Portfolio Manager', 'Principal Investor'],
-        salaryRange: { min: 30000, max: 60000, currency: 'EGP' },
+        typicalPay: '$$$',
         jobIds: ['bus-3'],
-        growthOpportunities: 'Partner track with carried interest (share of profits), or start your own fund. Top performers earn millions.',
+        growthOpportunities: 'Partner track with carried interest (share of profits), or start your own fund.',
       },
       {
         id: 'venture-capital',
@@ -77,7 +84,7 @@ export const careerSectors: CareerSector[] = [
         careerPath: 'Analyst → Associate → Principal → Partner. Alternative entry: successful entrepreneur or domain expert joining as partner.',
         requiredSkills: ['Market Research', 'Startup Evaluation', 'Network Building', 'Trend Analysis', 'Mentorship', 'Term Sheet Negotiation'],
         typicalTitles: ['VC Analyst', 'Investment Associate', 'Venture Partner', 'Principal'],
-        salaryRange: { min: 20000, max: 45000, currency: 'EGP' },
+        typicalPay: '$$',
         jobIds: ['bus-4'],
         growthOpportunities: 'Partner at major VC fund, angel investing, or starting your own VC fund. Many VCs also serve on startup boards.',
       },
@@ -90,11 +97,306 @@ export const careerSectors: CareerSector[] = [
         careerPath: 'Research Analyst → Portfolio Manager → Senior PM → CIO. CFA certification highly valued.',
         requiredSkills: ['Portfolio Construction', 'Risk Management', 'Market Research', 'Client Relations', 'Performance Analysis'],
         typicalTitles: ['Portfolio Manager', 'Research Analyst', 'Fund Manager', 'Investment Analyst'],
-        salaryRange: { min: 22000, max: 40000, currency: 'EGP' },
+        typicalPay: '$$',
         jobIds: ['bus-2'],
         growthOpportunities: 'Manage larger funds, launch your own fund, or move to hedge funds for higher risk/reward.',
       },
     ],
   },
-  // ... More sectors to be added
+
+  {
+    id: 'technology',
+    name: 'Technology & Software',
+    description: 'Building digital products, software, and tech infrastructure',
+    icon: '💻',
+    color: 'from-blue-600 to-blue-800',
+    overview: 'Technology drives modern civilization. From apps on your phone to AI systems transforming industries, tech careers let you build the future. Whether you code, design, or analyze data, there\'s a path for you.',
+    whyThisSector: 'Tech offers unlimited learning, remote work flexibility, and the ability to impact billions of users. You\'ll solve complex problems, work with cutting-edge tools, and be part of an industry that never stops evolving.',
+    skillsNeeded: ['Programming', 'Problem Solving', 'Algorithms', 'System Design', 'Collaboration', 'Continuous Learning'],
+    facultyAlignment: ['Informatics & Computer Science', 'Engineering'],
+    typicalPay: '$$',
+    functions: [
+      {
+        id: 'software-engineering',
+        name: 'Software Engineering',
+        description: 'Building applications, systems, and platforms that power businesses',
+        detailedDescription: 'Software engineers are the architects of the digital world. You\'ll design, build, and maintain software systems - from mobile apps to cloud platforms. It\'s creative problem-solving meets technical craft.',
+        dayInLife: 'Morning standup with team. Code new feature for payment system. Review teammate\'s pull request. Debug production issue. Design database schema for new module. Afternoon: Architecture meeting for Q2 roadmap.',
+        careerPath: 'Junior Engineer → Mid-level Engineer → Senior Engineer → Staff/Principal Engineer → Engineering Manager or Architect.',
+        requiredSkills: ['Programming (Python/JavaScript/Java)', 'Data Structures', 'Algorithms', 'Git', 'APIs', 'Databases'],
+        typicalTitles: ['Software Engineer', 'Backend Developer', 'Frontend Developer', 'Full-Stack Developer'],
+        typicalPay: '$$',
+        jobIds: ['eng-1', 'eng-2', 'eng-3', 'eng-4'],
+        growthOpportunities: 'Tech lead, architect, engineering manager, or startup founder. Remote work common.',
+      },
+      {
+        id: 'data-science',
+        name: 'Data Science & ML',
+        description: 'Extracting insights from data and building intelligent systems',
+        detailedDescription: 'Data scientists find patterns in chaos. You\'ll analyze massive datasets, build predictive models, and help companies make data-driven decisions. ML engineers take it further, deploying AI systems at scale.',
+        dayInLife: 'Clean and explore customer behavior dataset. Build ML model to predict churn. Present findings to product team. Optimize model performance. Deploy model to production. Monitor performance metrics.',
+        careerPath: 'Data Analyst → Data Scientist → Senior DS → Lead DS → ML Engineer → Research Scientist.',
+        requiredSkills: ['Python', 'Statistics', 'SQL', 'Machine Learning', 'Data Visualization', 'Communication'],
+        typicalTitles: ['Data Scientist', 'ML Engineer', 'Data Analyst', 'AI Engineer'],
+        typicalPay: '$$',
+        jobIds: ['eng-5'],
+        growthOpportunities: 'Research scientist, ML architect, or move into product/strategy roles.',
+      },
+      {
+        id: 'product-management-tech',
+        name: 'Product Management',
+        description: 'Defining what to build and why, bridging business and engineering',
+        detailedDescription: 'Product managers are the CEOs of their products. You define the roadmap, prioritize features, and ensure the team builds things customers actually want. It\'s strategy, user empathy, and execution combined.',
+        dayInLife: 'User research session. Prioritize backlog with engineering. Analyze feature adoption metrics. Write product requirements for new feature. Stakeholder meeting on Q3 goals. Customer feedback review.',
+        careerPath: 'Associate PM → PM → Senior PM → Group PM → Director → VP Product.',
+        requiredSkills: ['User Research', 'Analytics', 'Roadmap Planning', 'Stakeholder Management', 'Technical Understanding', 'Communication'],
+        typicalTitles: ['Product Manager', 'Technical Product Manager', 'Associate PM'],
+        typicalPay: '$$',
+        jobIds: ['eng-4'],
+        growthOpportunities: 'VP Product, CPO, or transition to GM/founder roles.',
+      },
+      {
+        id: 'uiux-design',
+        name: 'UI/UX Design',
+        description: 'Designing beautiful, intuitive digital experiences',
+        detailedDescription: 'Designers craft the look, feel, and flow of digital products. You\'ll conduct user research, create wireframes, and design interfaces that delight users. Great design is invisible - it just works.',
+        dayInLife: 'User interview sessions. Create wireframes for new checkout flow. Design high-fidelity mockups in Figma. Present designs to stakeholders. Collaborate with engineers on implementation. Usability testing.',
+        careerPath: 'Junior Designer → UX Designer → Senior Designer → Design Lead → Design Director.',
+        requiredSkills: ['Figma/Sketch', 'User Research', 'Prototyping', 'Visual Design', 'Interaction Design', 'Empathy'],
+        typicalTitles: ['UX Designer', 'UI Designer', 'Product Designer', 'UX Researcher'],
+        typicalPay: '$$',
+        jobIds: ['cre-1', 'cre-3'],
+        growthOpportunities: 'Design director, head of design, or freelance/agency work.',
+      },
+    ],
+  },
+
+  {
+    id: 'consulting',
+    name: 'Management Consulting',
+    description: 'Solving complex business problems for leading organizations',
+    icon: '📊',
+    color: 'from-purple-600 to-purple-800',
+    overview: 'Consultants are professional problem-solvers. You\'ll work with C-suite executives at Fortune 500 companies, diagnose their biggest challenges, and design solutions. Every project is different - one month you\'re optimizing supply chains, the next you\'re designing digital transformation strategies.',
+    whyThisSector: 'Consulting offers unmatched learning velocity. You\'ll gain business acumen in 2-3 years that would take 10+ years elsewhere. Plus: travel, prestige, and an alumni network that opens doors everywhere.',
+    skillsNeeded: ['Problem Solving', 'Communication', 'Excel', 'PowerPoint', 'Business Acumen', 'Client Management'],
+    facultyAlignment: ['Business Administration, Economics & Political Science', 'Engineering'],
+    typicalPay: '$$',
+    functions: [
+      {
+        id: 'strategy-consulting',
+        name: 'Strategy Consulting',
+        description: 'Helping executives make critical business decisions',
+        detailedDescription: 'Strategy consultants work on a company\'s most important questions: Should we enter this market? How do we compete with disruption? What\'s our M&A strategy? You\'ll analyze industries, build financial models, and present to CEOs.',
+        dayInLife: 'Client workshop on growth strategy. Analyze competitor positioning. Build market entry framework. Interview industry experts. Team dinner to prep for tomorrow\'s presentation. Late night: Perfect the slides.',
+        careerPath: 'Analyst → Associate → Engagement Manager → Partner (6-10 years). Many leave for industry roles after 2-4 years.',
+        requiredSkills: ['Strategic Thinking', 'Frameworks', 'Analysis', 'Presentation', 'Excel', 'Industry Research'],
+        typicalTitles: ['Management Consultant', 'Strategy Consultant', 'Business Analyst'],
+        typicalPay: '$$',
+        jobIds: ['bus-1'],
+        growthOpportunities: 'Partner track, or exit to industry (VP Strategy, corp dev, GM roles).',
+      },
+      {
+        id: 'operations-consulting',
+        name: 'Operations Consulting',
+        description: 'Improving how organizations run and deliver value',
+        detailedDescription: 'Operations consultants make companies more efficient. You\'ll optimize supply chains, redesign processes, and implement lean methodologies. It\'s hands-on work that drives measurable impact.',
+        dayInLife: 'Factory visit to map current state. Interview plant managers. Analyze production data. Design future-state process. Build implementation roadmap. Workshop with operations team.',
+        careerPath: 'Similar to strategy: Analyst → Consultant → Manager → Partner. Strong exit ops to industry operations roles.',
+        requiredSkills: ['Process Optimization', 'Data Analysis', 'Change Management', 'Lean/Six Sigma', 'Project Management'],
+        typicalTitles: ['Operations Consultant', 'Process Improvement Consultant', 'Supply Chain Consultant'],
+        typicalPay: '$$',
+        jobIds: ['bus-1'],
+        growthOpportunities: 'VP Operations, COO track in industry, or specialized boutique consulting.',
+      },
+      {
+        id: 'tech-consulting',
+        name: 'Technology Consulting',
+        description: 'Helping organizations leverage technology for business value',
+        detailedDescription: 'Tech consultants bridge business and IT. You\'ll design digital transformation strategies, select enterprise software, and lead implementation projects. It\'s less coding, more advisory on technology decisions.',
+        dayInLife: 'ERP system selection workshop. Cloud migration strategy. Vendor demos. Requirements gathering with IT team. Build business case for digital initiative.',
+        careerPath: 'Consultant → Senior Consultant → Manager → Senior Manager → Partner.',
+        requiredSkills: ['Business Process', 'Enterprise Systems', 'Digital Strategy', 'Vendor Management', 'Change Management'],
+        typicalTitles: ['Technology Consultant', 'Digital Transformation Consultant', 'IT Strategy Consultant'],
+        typicalPay: '$$',
+        jobIds: ['bus-1'],
+        growthOpportunities: 'CTO/CIO track in industry, product management, or tech startup founder.',
+      },
+    ],
+  },
+
+  {
+    id: 'healthcare',
+    name: 'Healthcare & Life Sciences',
+    description: 'Improving health and saving lives through medical practice and innovation',
+    icon: '🏥',
+    color: 'from-red-600 to-red-800',
+    overview: 'Healthcare is the most directly impactful career sector. Whether you\'re treating patients, developing drugs, or managing hospital operations, you\'re making a tangible difference in people\'s lives every single day.',
+    whyThisSector: 'Beyond the mission-driven work, healthcare offers job security, respect, and diverse career paths. The sector is growing rapidly with aging populations and medical innovation creating new opportunities.',
+    skillsNeeded: ['Medical Knowledge', 'Patient Care', 'Empathy', 'Attention to Detail', 'Communication', 'Continuous Learning'],
+    facultyAlignment: ['Pharmacy', 'Dentistry', 'Nursing', 'Physiotherapy'],
+    typicalPay: '$$',
+    functions: [
+      {
+        id: 'clinical-pharmacy',
+        name: 'Clinical Pharmacy',
+        description: 'Medication management and pharmaceutical care in healthcare settings',
+        detailedDescription: 'Clinical pharmacists are medication experts on the healthcare team. You\'ll review prescriptions, monitor drug interactions, counsel patients, and optimize therapy outcomes. You\'re the bridge between doctors and safe, effective medication use.',
+        dayInLife: 'Morning rounds with medical team. Review medication orders for interactions. Counsel patient on new diabetes medication. Dose adjustment for renal patient. Educate nurses on new protocol. Document interventions.',
+        careerPath: 'Staff Pharmacist → Clinical Specialist → Pharmacy Manager → Director of Pharmacy.',
+        requiredSkills: ['Pharmacology', 'Drug Interactions', 'Patient Counseling', 'Clinical Guidelines', 'Documentation'],
+        typicalTitles: ['Clinical Pharmacist', 'Hospital Pharmacist', 'Pharmacy Specialist'],
+        typicalPay: '$$',
+        jobIds: ['pharm-1', 'pharm-2'],
+        growthOpportunities: 'Specialty certifications, pharmacy director, or clinical research.',
+      },
+      {
+        id: 'dental-practice',
+        name: 'Dental Practice',
+        description: 'Oral healthcare, from preventive care to complex procedures',
+        detailedDescription: 'Dentists diagnose and treat oral health issues, perform procedures from cleanings to surgeries, and help patients maintain healthy teeth for life. You can specialize in orthodontics, oral surgery, or other areas.',
+        dayInLife: 'Morning: routine checkups and cleanings. Afternoon: crown prep, filling cavity, orthodontic consultation. Review X-rays. Discuss treatment plan with patient. Emergency root canal. Update patient records.',
+        careerPath: 'General Dentist → Specialist (if pursuing) → Practice Owner → Multi-location owner.',
+        requiredSkills: ['Dental Procedures', 'Patient Care', 'Diagnosis', 'Manual Dexterity', 'Business Management'],
+        typicalTitles: ['General Dentist', 'Orthodontist', 'Oral Surgeon', 'Pediatric Dentist'],
+        typicalPay: '$$$',
+        jobIds: ['dent-1', 'dent-2'],
+        growthOpportunities: 'Specialization, private practice ownership, academic dentistry.',
+      },
+      {
+        id: 'nursing',
+        name: 'Nursing',
+        description: 'Direct patient care and health advocacy',
+        detailedDescription: 'Nurses are the backbone of healthcare. You\'ll monitor patients, administer medications, coordinate care, and be the constant presence patients rely on. Specializations range from ICU to pediatrics to surgery.',
+        dayInLife: 'Receive patient handoff. Vitals check rounds. Administer medications. Assist doctor with procedure. Update care plans. Educate family members. Emergency response. Document everything.',
+        careerPath: 'Staff Nurse → Charge Nurse → Nurse Manager → Director of Nursing → CNO.',
+        requiredSkills: ['Patient Assessment', 'Medical Procedures', 'Care Coordination', 'Communication', 'Empathy', 'Critical Thinking'],
+        typicalTitles: ['Registered Nurse', 'ICU Nurse', 'ER Nurse', 'Nurse Practitioner'],
+        typicalPay: '$',
+        jobIds: ['nurs-1', 'nurs-2', 'nurs-3'],
+        growthOpportunities: 'Nurse practitioner, management, education, or specialized certifications.',
+      },
+      {
+        id: 'physiotherapy',
+        name: 'Physiotherapy',
+        description: 'Rehabilitation and physical wellness through movement',
+        detailedDescription: 'Physiotherapists help people recover from injuries, manage chronic conditions, and optimize physical function. You\'ll assess movement, design exercise programs, and use hands-on techniques to improve mobility and reduce pain.',
+        dayInLife: 'Assess new post-surgery patient. Design rehab program. Manual therapy session. Teach exercises. Modify treatment plan based on progress. Sports injury evaluation. Group class for back pain.',
+        careerPath: 'Staff Physiotherapist → Senior Physiotherapist → Clinic Manager → Practice Owner.',
+        requiredSkills: ['Anatomy', 'Movement Analysis', 'Manual Therapy', 'Exercise Prescription', 'Patient Education'],
+        typicalTitles: ['Physiotherapist', 'Sports Physiotherapist', 'Rehabilitation Specialist'],
+        typicalPay: '$',
+        jobIds: ['physio-1', 'physio-2'],
+        growthOpportunities: 'Sports medicine, private practice, specialization (e.g., neurological, pediatric).',
+      },
+    ],
+  },
+
+  {
+    id: 'engineering',
+    name: 'Engineering & Design',
+    description: 'Creating physical systems, infrastructure, and innovative solutions',
+    icon: '⚙️',
+    color: 'from-gray-600 to-gray-800',
+    overview: 'Engineers are builders and problem-solvers who shape the physical world. From designing machinery to constructing skyscrapers to developing renewable energy systems, engineering turns ideas into reality.',
+    whyThisSector: 'Engineering offers the satisfaction of seeing your designs come to life. You\'ll tackle complex technical challenges, work on projects that matter, and build a career based on concrete, measurable skills.',
+    skillsNeeded: ['Technical Design', 'Problem Solving', 'CAD Software', 'Math & Physics', 'Project Management', 'Attention to Detail'],
+    facultyAlignment: ['Engineering', 'Energy & Environmental Engineering'],
+    typicalPay: '$$',
+    functions: [
+      {
+        id: 'mechanical-engineering',
+        name: 'Mechanical Engineering',
+        description: 'Designing and optimizing mechanical systems and machinery',
+        detailedDescription: 'Mechanical engineers design everything from car engines to manufacturing equipment to HVAC systems. You\'ll use CAD software, run simulations, and ensure products are functional, efficient, and manufacturable.',
+        dayInLife: 'Design review meeting. CAD modeling of new component. FEA simulation to test stresses. Visit manufacturing floor. Update technical drawings. Collaborate with suppliers on materials.',
+        careerPath: 'Junior Engineer → Engineer → Senior Engineer → Lead Engineer → Engineering Manager.',
+        requiredSkills: ['CAD (SolidWorks/AutoCAD)', 'Thermodynamics', 'Mechanics', 'Manufacturing Processes', 'Simulation'],
+        typicalTitles: ['Mechanical Engineer', 'Design Engineer', 'Manufacturing Engineer', 'R&D Engineer'],
+        typicalPay: '$$',
+        jobIds: ['mech-1', 'mech-2'],
+        growthOpportunities: 'Engineering manager, technical specialist, or move into product management.',
+      },
+      {
+        id: 'civil-structural',
+        name: 'Civil & Structural Engineering',
+        description: 'Designing infrastructure, buildings, and urban systems',
+        detailedDescription: 'Civil engineers plan, design, and oversee construction of infrastructure - roads, bridges, buildings, water systems. You\'re responsible for structures that must be safe, functional, and stand the test of time.',
+        dayInLife: 'Site inspection of construction progress. Structural calculations for building design. Review soil test results. Coordinate with architects. Update project timeline. Submit permit applications.',
+        careerPath: 'Junior Civil Engineer → Project Engineer → Senior Engineer → Project Manager → Principal.',
+        requiredSkills: ['Structural Analysis', 'AutoCAD', 'Project Management', 'Building Codes', 'Site Management'],
+        typicalTitles: ['Civil Engineer', 'Structural Engineer', 'Project Engineer', 'Construction Manager'],
+        typicalPay: '$$',
+        jobIds: ['civil-1'],
+        growthOpportunities: 'Project management, consultancy, government roles, or start your own firm.',
+      },
+      {
+        id: 'renewable-energy',
+        name: 'Renewable Energy Engineering',
+        description: 'Developing sustainable energy solutions for the future',
+        detailedDescription: 'Renewable energy engineers design and optimize solar, wind, and other clean energy systems. You\'re at the forefront of the energy transition, solving one of humanity\'s biggest challenges: sustainable power.',
+        dayInLife: 'Solar farm performance analysis. Design PV system for new installation. Energy modeling and simulations. Site assessment visit. Optimize inverter configuration. Report on energy yield.',
+        careerPath: 'Energy Engineer → Senior Engineer → Technical Lead → Energy Director.',
+        requiredSkills: ['Solar/Wind Systems', 'Energy Modeling', 'Electrical Engineering', 'Project Management', 'Sustainability'],
+        typicalTitles: ['Renewable Energy Engineer', 'Solar Engineer', 'Energy Analyst', 'Sustainability Engineer'],
+        typicalPay: '$$',
+        jobIds: ['energy-1', 'energy-3'],
+        growthOpportunities: 'Technical expert, project development, energy consultancy, or cleantech startups.',
+      },
+    ],
+  },
+
+  {
+    id: 'marketing-media',
+    name: 'Marketing & Media',
+    description: 'Building brands, creating content, and connecting with audiences',
+    icon: '📱',
+    color: 'from-pink-600 to-pink-800',
+    overview: 'Marketing and media professionals shape how brands communicate, grow, and engage with customers. From crafting viral campaigns to analyzing customer behavior to producing content, this sector blends creativity with data.',
+    whyThisSector: 'Marketing offers variety and creativity. Every campaign is different, you see direct impact on business growth, and the digital revolution has created endless new opportunities. Plus, strong marketing skills transfer across any industry.',
+    skillsNeeded: ['Creativity', 'Communication', 'Data Analysis', 'Social Media', 'Content Creation', 'Strategy'],
+    facultyAlignment: ['Communication & Mass Media', 'Business Administration, Economics & Political Science'],
+    typicalPay: '$',
+    functions: [
+      {
+        id: 'digital-marketing',
+        name: 'Digital Marketing',
+        description: 'Growing brands through online channels and data-driven campaigns',
+        detailedDescription: 'Digital marketers run campaigns across Google, social media, email, and more. You\'ll analyze data, test creatives, optimize conversions, and drive measurable business growth. It\'s equal parts creative and analytical.',
+        dayInLife: 'Review campaign performance metrics. A/B test ad creatives. Plan Instagram influencer collaboration. Analyze customer journey. Update SEO strategy. Weekly performance report to management.',
+        careerPath: 'Marketing Coordinator → Digital Marketing Specialist → Marketing Manager → Director of Marketing.',
+        requiredSkills: ['SEO/SEM', 'Social Media', 'Google Analytics', 'Copywriting', 'A/B Testing', 'Marketing Automation'],
+        typicalTitles: ['Digital Marketing Manager', 'Social Media Manager', 'Growth Marketer', 'Performance Marketing Manager'],
+        typicalPay: '$',
+        jobIds: ['mar-1', 'mar-3'],
+        growthOpportunities: 'CMO track, growth consulting, agency work, or digital marketing entrepreneurship.',
+      },
+      {
+        id: 'content-strategy',
+        name: 'Content Strategy & Creation',
+        description: 'Crafting compelling stories and managing brand voice',
+        detailedDescription: 'Content strategists plan what content to create, for whom, and why. You\'ll write blog posts, scripts, and social copy, manage editorial calendars, and ensure every piece of content serves business goals.',
+        dayInLife: 'Plan content calendar for Q2. Write blog post on industry trends. Film video for social media. Edit interview transcript. Collaborate with designers on infographic. Analyze content performance.',
+        careerPath: 'Content Writer → Content Strategist → Senior Strategist → Head of Content.',
+        requiredSkills: ['Writing', 'Storytelling', 'SEO', 'Editorial Planning', 'Social Media', 'Content Management'],
+        typicalTitles: ['Content Strategist', 'Content Manager', 'Content Marketing Manager', 'Brand Storyteller'],
+        typicalPay: '$',
+        jobIds: ['mar-2', 'arts-1'],
+        growthOpportunities: 'Editorial director, brand strategy, freelance content consulting.',
+      },
+      {
+        id: 'brand-management',
+        name: 'Brand Management',
+        description: 'Building and evolving brand identity and market positioning',
+        detailedDescription: 'Brand managers own the strategic direction of a brand. You\'ll define positioning, launch new products, manage campaigns, and ensure every touchpoint reflects brand values. It\'s high-level marketing strategy.',
+        dayInLife: 'Consumer insights review. Brand refresh workshop. Product launch planning. Review creative from agency. Competitive analysis. Budget allocation meeting. Present Q3 brand strategy to leadership.',
+        careerPath: 'Assistant Brand Manager → Brand Manager → Senior Brand Manager → Brand Director.',
+        requiredSkills: ['Brand Strategy', 'Market Research', 'Product Launch', 'Budget Management', 'Cross-functional Leadership'],
+        typicalTitles: ['Brand Manager', 'Product Marketing Manager', 'Marketing Manager'],
+        typicalPay: '$$',
+        jobIds: ['mar-1'],
+        growthOpportunities: 'VP Marketing, CMO, or general management roles.',
+      },
+    ],
+  },
 ];
