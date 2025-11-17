@@ -396,7 +396,7 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
 
               <button
                 onClick={() => setStep('build-profile-2')}
-                disabled={educationStory.length < 50}
+                disabled={educationStory.length < 10}
                 className="w-full py-4 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Continue to Experience
@@ -440,7 +440,7 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
 
               <button
                 onClick={() => setStep('build-profile-3')}
-                disabled={experienceStory.length < 30}
+                disabled={experienceStory.length < 10}
                 className="w-full py-4 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Continue to Interests

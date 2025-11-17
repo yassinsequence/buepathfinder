@@ -59,7 +59,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Financial Modeling', 'PowerPoint', 'Excel', 'Valuation', 'Deal Structuring'],
         typicalTitles: ['Investment Banking Analyst', 'M&A Analyst', 'Corporate Finance Associate'],
         typicalPay: '$$$',
-        jobIds: ['bus-2'],
+        jobIds: ['fin-1', 'bus-2'],
         growthOpportunities: 'Exit to PE/VC or climb to MD with significant compensation.',
       },
       {
@@ -72,7 +72,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Portfolio Construction', 'Risk Management', 'Market Research', 'Performance Analysis'],
         typicalTitles: ['Portfolio Manager', 'Research Analyst', 'Fund Manager'],
         typicalPay: '$$',
-        jobIds: ['bus-2'],
+        jobIds: ['fin-4'],
         growthOpportunities: 'CIO role, launch your own fund, or specialize in alternatives.',
       },
       {
@@ -85,7 +85,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Relationship Building', 'Financial Planning', 'Tax Strategy', 'Communication'],
         typicalTitles: ['Wealth Advisor', 'Private Banker', 'Relationship Manager'],
         typicalPay: '$$',
-        jobIds: ['bus-2'],
+        jobIds: ['fin-5'],
         growthOpportunities: 'Build large client book, become partner, or start independent practice.',
       },
       {
@@ -98,7 +98,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Market Knowledge', 'Quick Decision-Making', 'Risk Management', 'Bloomberg Terminal'],
         typicalTitles: ['Equity Trader', 'FX Trader', 'Sales Trader'],
         typicalPay: '$$$',
-        jobIds: ['bus-2'],
+        jobIds: ['fin-2'],
         growthOpportunities: 'Head of trading, start prop trading desk, or hedge fund.',
       },
       {
@@ -111,7 +111,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Risk Modeling', 'Statistics', 'VaR', 'Python', 'Regulations'],
         typicalTitles: ['Risk Analyst', 'Market Risk Manager', 'Credit Risk Officer'],
         typicalPay: '$$',
-        jobIds: ['bus-2'],
+        jobIds: ['fin-3'],
         growthOpportunities: 'CRO, risk consultancy, or regulatory body.',
       },
       {
@@ -124,7 +124,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Financial Analysis', 'Modeling', 'Industry Knowledge', 'Writing', 'Excel'],
         typicalTitles: ['Equity Research Analyst', 'Sector Analyst', 'Research Associate'],
         typicalPay: '$$',
-        jobIds: ['bus-2'],
+        jobIds: ['fin-1', 'bus-2'],
         growthOpportunities: 'Senior analyst, portfolio management, or buy-side roles.',
       },
     ],
@@ -178,7 +178,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Product Strategy', 'User Research', 'Data Analysis', 'Communication', 'Prioritization'],
         typicalTitles: ['Product Manager', 'Product Owner', 'Technical PM'],
         typicalPay: '$$',
-        jobIds: ['eng-4'],
+        jobIds: ['tech-4', 'eng-4'],
         growthOpportunities: 'CPO, start your own company, or transition to VC.',
       },
       {
@@ -217,7 +217,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Test Automation', 'Selenium', 'Jira', 'API Testing', 'Attention to Detail'],
         typicalTitles: ['QA Engineer', 'Test Automation Engineer', 'Quality Assurance Specialist'],
         typicalPay: '$',
-        jobIds: ['eng-1'],
+        jobIds: ['tech-1'],
         growthOpportunities: 'QA manager, automation architect, or DevOps transition.',
       },
       {
@@ -230,7 +230,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Network Security', 'Penetration Testing', 'SIEM', 'Ethical Hacking', 'Security Frameworks'],
         typicalTitles: ['Security Analyst', 'Penetration Tester', 'Security Engineer'],
         typicalPay: '$$',
-        jobIds: ['eng-6'],
+        jobIds: ['tech-2', 'eng-6'],
         growthOpportunities: 'CISO, security consultancy, or specialized penetration testing.',
       },
       {
@@ -243,7 +243,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Technical Writing', 'APIs', 'Documentation Tools', 'Communication', 'Learning Ability'],
         typicalTitles: ['Technical Writer', 'Documentation Engineer', 'Developer Advocate'],
         typicalPay: '$',
-        jobIds: ['eng-1'],
+        jobIds: ['tech-3'],
         growthOpportunities: 'Lead technical writer, developer relations, or content strategy.',
       },
     ],
@@ -310,7 +310,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['SQL', 'Power BI', 'Tableau', 'Data Warehousing', 'Business Analysis'],
         typicalTitles: ['Business Intelligence Analyst', 'BI Developer', 'Data Consultant'],
         typicalPay: '$$',
-        jobIds: ['bus-1', 'eng-2'],
+        jobIds: ['cons-1', 'bus-1', 'eng-2'],
         growthOpportunities: 'BI director, data strategy, or analytics consultancy.',
       },
       {
@@ -323,7 +323,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Communication', 'Training', 'Stakeholder Management', 'Psychology', 'Project Management'],
         typicalTitles: ['Change Manager', 'Organizational Change Consultant', 'Transformation Manager'],
         typicalPay: '$$',
-        jobIds: ['bus-3'],
+        jobIds: ['cons-2', 'bus-3'],
         growthOpportunities: 'Head of change, HR leadership, or independent consultancy.',
       },
       {
@@ -336,7 +336,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['HR Strategy', 'Talent Management', 'Compensation', 'Organizational Design', 'Analytics'],
         typicalTitles: ['HR Consultant', 'Talent Consultant', 'People Strategy Advisor'],
         typicalPay: '$$',
-        jobIds: ['bus-1'],
+        jobIds: ['cons-3', 'bus-1'],
         growthOpportunities: 'CHRO, talent director, or HR consulting firm.',
       },
     ],
@@ -416,7 +416,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Research', 'Innovation', 'Scientific Method', 'Problem Solving', 'Technical Writing'],
         typicalTitles: ['R&D Engineer', 'Research Engineer', 'Innovation Specialist'],
         typicalPay: '$$',
-        jobIds: ['mech-1', 'elec-1'],
+        jobIds: ['eng-7', 'mech-1', 'elec-1'],
         growthOpportunities: 'CTO, head of innovation, or start tech company.',
       },
       {
@@ -429,7 +429,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Quality Standards', 'ISO', 'Six Sigma', 'Testing', 'Statistical Analysis'],
         typicalTitles: ['Quality Engineer', 'QA Manager', 'Quality Control Specialist'],
         typicalPay: '$',
-        jobIds: ['mech-2'],
+        jobIds: ['eng-8', 'mech-2'],
         growthOpportunities: 'Quality director, Six Sigma Black Belt, or quality consultancy.',
       },
       {
@@ -442,7 +442,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Project Management', 'PMP', 'Scheduling', 'Budgeting', 'Leadership'],
         typicalTitles: ['Project Manager', 'Project Engineer', 'Program Manager'],
         typicalPay: '$$',
-        jobIds: ['civil-1', 'mech-1'],
+        jobIds: ['eng-9', 'civil-1', 'mech-1'],
         growthOpportunities: 'Senior program manager, PMO director, or independent PM.',
       },
     ],
@@ -615,7 +615,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['GCP', 'Clinical Research', 'Data Management', 'Protocol Design', 'Regulatory'],
         typicalTitles: ['Clinical Research Associate', 'Clinical Trial Manager', 'CRA'],
         typicalPay: '$$',
-        jobIds: ['med-1', 'pharm-1'],
+        jobIds: ['pharm-5', 'med-1', 'pharm-1'],
         growthOpportunities: 'Clinical operations director, CRO leadership, or consulting.',
       },
       {
@@ -628,7 +628,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['GMP', 'Quality Systems', 'Auditing', 'Documentation', 'Regulations'],
         typicalTitles: ['QA Officer', 'Quality Assurance Manager', 'GMP Specialist'],
         typicalPay: '$$',
-        jobIds: ['pharm-2', 'med-2'],
+        jobIds: ['pharm-6', 'pharm-2', 'med-2'],
         growthOpportunities: 'Head of quality, consulting, or regulatory body.',
       },
       {
@@ -721,7 +721,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Media Relations', 'Writing', 'Crisis Management', 'Networking', 'Communication'],
         typicalTitles: ['PR Manager', 'Communications Specialist', 'Media Relations Manager'],
         typicalPay: '$$',
-        jobIds: ['mar-3'],
+        jobIds: ['mar-4', 'mar-3'],
         growthOpportunities: 'Head of communications, PR agency owner, or corporate affairs.',
       },
       {
@@ -734,7 +734,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Research Methods', 'Data Analysis', 'SPSS', 'Consumer Psychology', 'Presentation'],
         typicalTitles: ['Market Research Analyst', 'Consumer Insights Manager', 'Research Specialist'],
         typicalPay: '$$',
-        jobIds: ['mar-1', 'bus-1'],
+        jobIds: ['mar-5', 'mar-1', 'bus-1'],
         growthOpportunities: 'Head of insights, research consultancy, or strategy role.',
       },
       {
@@ -747,7 +747,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Event Planning', 'Project Management', 'Budgeting', 'Vendor Management', 'Creativity'],
         typicalTitles: ['Event Manager', 'Experiential Marketing Manager', 'Event Coordinator'],
         typicalPay: '$',
-        jobIds: ['mar-2'],
+        jobIds: ['mar-6', 'mar-2'],
         growthOpportunities: 'Head of events, event agency owner, or marketing director.',
       },
     ],
@@ -827,7 +827,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Photography', 'Lighting', 'Photo Editing', 'Lightroom', 'Creative Eye'],
         typicalTitles: ['Photographer', 'Commercial Photographer', 'Product Photographer'],
         typicalPay: '$',
-        jobIds: ['cre-3'],
+        jobIds: ['cre-5', 'cre-3'],
         growthOpportunities: 'Studio owner, celebrity photographer, or visual director.',
       },
       {
@@ -840,7 +840,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Writing', 'Persuasion', 'Creativity', 'SEO Writing', 'Storytelling'],
         typicalTitles: ['Copywriter', 'Creative Writer', 'Content Writer'],
         typicalPay: '$',
-        jobIds: ['cre-3', 'mar-2'],
+        jobIds: ['cre-6', 'cre-3', 'mar-2'],
         growthOpportunities: 'Head of copy, creative director, or freelance copywriter.',
       },
       {
@@ -853,7 +853,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Creative Direction', 'Leadership', 'Design Principles', 'Campaign Strategy', 'Presentation'],
         typicalTitles: ['Art Director', 'Creative Director', 'Senior Art Director'],
         typicalPay: '$$',
-        jobIds: ['cre-2', 'cre-4'],
+        jobIds: ['cre-7', 'cre-2', 'cre-4'],
         growthOpportunities: 'Executive Creative Director, agency owner, or brand CCO.',
       },
       {
@@ -933,7 +933,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['IP Law', 'Patent Drafting', 'Trademark Law', 'Research', 'Technical Understanding'],
         typicalTitles: ['IP Lawyer', 'Patent Attorney', 'Trademark Counsel'],
         typicalPay: '$$$',
-        jobIds: ['law-1', 'law-4'],
+        jobIds: ['law-5', 'law-1', 'law-4'],
         growthOpportunities: 'IP partner, in-house IP counsel at tech company, or IP boutique.',
       },
       {
@@ -946,7 +946,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Tax Law', 'Accounting', 'Financial Analysis', 'Tax Planning', 'Regulations'],
         typicalTitles: ['Tax Lawyer', 'Tax Advisor', 'Tax Counsel'],
         typicalPay: '$$',
-        jobIds: ['law-4'],
+        jobIds: ['law-6', 'law-4'],
         growthOpportunities: 'Tax partner, head of tax at company, or boutique tax firm.',
       },
       {
@@ -1000,7 +1000,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Sustainability Strategy', 'Carbon Accounting', 'ESG', 'Reporting'],
         typicalTitles: ['Sustainability Consultant', 'ESG Advisor', 'Environmental Consultant'],
         typicalPay: '$$',
-        jobIds: ['energy-3'],
+        jobIds: ['sust-1', 'energy-3'],
         growthOpportunities: 'Head of Sustainability, consulting partner, or CSO role.',
       },
       {
@@ -1039,7 +1039,7 @@ export const careerSectors: CareerSector[] = [
         requiredSkills: ['Carbon Accounting', 'GHG Protocol', 'Climate Strategy', 'Data Analysis', 'Reporting'],
         typicalTitles: ['Carbon Manager', 'Climate Analyst', 'Net Zero Specialist'],
         typicalPay: '$$',
-        jobIds: ['energy-3'],
+        jobIds: ['sust-2', 'energy-3'],
         growthOpportunities: 'Chief Sustainability Officer, carbon consultancy, or climate tech.',
       },
       {

@@ -6,7 +6,12 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 async function extractTextFromPDFWithGemini(buffer: Buffer): Promise<string> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-pro',
+      generationConfig: {
+        temperature: 0.1,
+      }
+    });
 
     // Convert PDF buffer to base64
     const base64Data = buffer.toString('base64');
@@ -18,14 +23,29 @@ async function extractTextFromPDFWithGemini(buffer: Buffer): Promise<string> {
           mimeType: 'application/pdf'
         }
       },
-      'Extract all text content from this CV/Resume PDF. Return only the raw text, preserving the structure and formatting as much as possible.'
+      'Extract all text content from this CV/Resume PDF. Return only the raw text content, preserving the structure and formatting as much as possible. Include all sections like education, experience, skills, etc.'
     ]);
 
-    const text = result.response.text();
+    const response = result.response;
+    const text = response.text();
+
+    if (!text || text.trim().length === 0) {
+      throw new Error('No text extracted from PDF');
+    }
+
     return text;
   } catch (error: any) {
     console.error('Gemini PDF extraction error:', error);
-    throw new Error('Failed to extract text from PDF using AI');
+    console.error('Error details:', error.message);
+
+    // More specific error message
+    if (error.message?.includes('API key')) {
+      throw new Error('API configuration error. Please contact support.');
+    } else if (error.message?.includes('quota')) {
+      throw new Error('Service temporarily unavailable. Please try again later.');
+    } else {
+      throw new Error(`Failed to read PDF: ${error.message || 'Unknown error'}`);
+    }
   }
 }
 
