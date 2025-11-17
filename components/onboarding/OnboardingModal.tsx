@@ -12,20 +12,28 @@ interface OnboardingModalProps {
 
 export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
   const router = useRouter();
-  const [step, setStep] = useState<'choice' | 'upload' | 'preferences' | 'build-profile-1' | 'build-profile-2' | 'build-profile-3'>('choice');
+  const [step, setStep] = useState<'choice' | 'upload' | 'build-profile-1' | 'build-profile-2' | 'build-profile-3' | 'create-cv-chat'>('choice');
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
 
-  // Preferences form
-  const [major, setMajor] = useState('');
-  const [interests, setInterests] = useState<string[]>([]);
-  const [experienceLevel, setExperienceLevel] = useState('entry');
-
-  // Build Profile form
+  // Build Profile form (merged with preferences)
   const [educationStory, setEducationStory] = useState('');
   const [experienceStory, setExperienceStory] = useState('');
+  const [interests, setInterests] = useState<string[]>([]);
   const [isAnalyzingProfile, setIsAnalyzingProfile] = useState(false);
+
+  // CV Builder Chatbot
+  const [cvChatMessages, setCvChatMessages] = useState<Array<{role: 'assistant' | 'user', content: string}>>([]);
+  const [cvChatInput, setCvChatInput] = useState('');
+  const [isChatLoading, setIsChatLoading] = useState(false);
+  const [cvData, setCvData] = useState({
+    personalInfo: { name: '', email: '', phone: '', location: '' },
+    summary: '',
+    education: [] as Array<{institution: string, degree: string, year: string}>,
+    experience: [] as Array<{company: string, position: string, duration: string, description: string}>,
+    skills: [] as string[],
+  });
 
   const availableInterests = [
     'Software Development', 'Data Science', 'Mechanical Engineering', 'Civil Engineering',
@@ -92,22 +100,6 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
     }
   };
 
-  const handleSavePreferences = () => {
-    // Save basic preferences
-    saveUserProfile({
-      cvText: `Major: ${major}\nInterests: ${interests.join(', ')}\nExperience: ${experienceLevel}`,
-      cvFileName: 'Quick Preferences',
-      cvUploadedAt: new Date().toISOString(),
-      skills: interests,
-      careerLevel: experienceLevel as any,
-      aiSummary: `${experienceLevel.charAt(0).toUpperCase() + experienceLevel.slice(1)} level professional interested in ${interests.join(', ')} with background in ${major}`,
-      recommendedJobIds: [],
-    });
-
-    onClose();
-    window.location.reload();
-  };
-
   const toggleInterest = (interest: string) => {
     setInterests(prev =>
       prev.includes(interest)
@@ -168,6 +160,60 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
     }
   };
 
+  const handleCvChatSubmit = async () => {
+    if (!cvChatInput.trim()) return;
+
+    const userMessage = cvChatInput;
+    setCvChatInput('');
+    setCvChatMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setIsChatLoading(true);
+
+    try {
+      const response = await fetch('/api/cv-builder-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [...cvChatMessages, { role: 'user', content: userMessage }],
+          cvData,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        setCvChatMessages(prev => [...prev, {
+          role: 'assistant',
+          content: 'Sorry, I encountered an error. Please try again.'
+        }]);
+        return;
+      }
+
+      setCvChatMessages(prev => [...prev, {
+        role: 'assistant',
+        content: data.message
+      }]);
+
+      if (data.cvData) {
+        setCvData(data.cvData);
+      }
+
+      if (data.completed) {
+        // CV is complete, download it
+        setTimeout(() => {
+          window.open(data.downloadUrl, '_blank');
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('CV chat error:', error);
+      setCvChatMessages(prev => [...prev, {
+        role: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.'
+      }]);
+    } finally {
+      setIsChatLoading(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
       <div className="bg-slate-800 border border-slate-700 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -204,7 +250,7 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
                     <div className="flex-1">
                       <h4 className="text-xl font-bold text-white mb-2">Upload Your CV</h4>
                       <p className="text-gray-300">
-                        Get AI-powered analysis and personalized recommendations based on your experience
+                        Already have a CV? Upload it for instant AI-powered analysis and personalized career recommendations
                       </p>
                     </div>
                   </div>
@@ -212,6 +258,32 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
 
                 <button
                   onClick={() => setStep('build-profile-1')}
+                  className="group bg-gradient-to-r from-amber-500/10 to-amber-600/10 hover:from-amber-500/20 hover:to-amber-600/20 border-2 border-amber-500/30 hover:border-amber-500 rounded-xl p-6 transition-all text-left"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-amber-500/20 rounded-lg">
+                      <Sparkles className="w-6 h-6 text-amber-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                        Get Started
+                        <span className="text-xs px-2 py-1 bg-amber-500 text-slate-900 rounded-full">Recommended</span>
+                      </h4>
+                      <p className="text-gray-300">
+                        Share your education, experience, and interests - our AI will build your profile and find the perfect career paths
+                      </p>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setStep('create-cv-chat');
+                    setCvChatMessages([{
+                      role: 'assistant',
+                      content: "Hi! I'm your CV builder assistant. I'll help you create an ATS-friendly CV that gets noticed by recruiters. Let's start with your personal information. What's your full name?"
+                    }]);
+                  }}
                   className="group bg-slate-700 hover:bg-slate-600 border-2 border-slate-600 hover:border-amber-500 rounded-xl p-6 transition-all text-left"
                 >
                   <div className="flex items-start gap-4">
@@ -219,26 +291,9 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
                       <FileText className="w-6 h-6 text-amber-400" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="text-xl font-bold text-white mb-2">Build Your Profile</h4>
+                      <h4 className="text-xl font-bold text-white mb-2">Create Your CV</h4>
                       <p className="text-gray-300">
-                        Share your story - we'll extract your skills and match you to the best paths
-                      </p>
-                    </div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => setStep('preferences')}
-                  className="group bg-slate-700 hover:bg-slate-600 border-2 border-slate-600 hover:border-amber-500 rounded-xl p-6 transition-all text-left"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-amber-500/20 rounded-lg">
-                      <Sparkles className="w-6 h-6 text-amber-400" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-xl font-bold text-white mb-2">Quick Start</h4>
-                      <p className="text-gray-300">
-                        Answer a few questions about your education and interests
+                        Don't have a CV? Chat with our AI to build a professional, ATS-friendly CV from scratch
                       </p>
                     </div>
                   </div>
@@ -304,82 +359,6 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
             </div>
           )}
 
-          {/* Step 3: Quick Preferences */}
-          {step === 'preferences' && (
-            <div className="space-y-6">
-              <button
-                onClick={() => setStep('choice')}
-                className="text-amber-400 hover:text-amber-300 text-sm flex items-center gap-2"
-              >
-                ← Back
-              </button>
-
-              <h3 className="text-2xl font-bold text-white mb-4">Tell us about yourself</h3>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Your Major or Field of Study
-                </label>
-                <input
-                  type="text"
-                  value={major}
-                  onChange={(e) => setMajor(e.target.value)}
-                  placeholder="e.g., Computer Science, Business, Engineering"
-                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Experience Level
-                </label>
-                <div className="grid grid-cols-3 gap-3">
-                  {['entry', 'mid', 'senior'].map((level) => (
-                    <button
-                      key={level}
-                      onClick={() => setExperienceLevel(level)}
-                      className={`py-3 rounded-lg font-medium transition-all ${
-                        experienceLevel === level
-                          ? 'bg-amber-500 text-slate-900'
-                          : 'bg-slate-700 text-gray-300 hover:bg-slate-600 border border-slate-600'
-                      }`}
-                    >
-                      {level.charAt(0).toUpperCase() + level.slice(1)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Your Interests (select all that apply)
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {availableInterests.map((interest) => (
-                    <button
-                      key={interest}
-                      onClick={() => toggleInterest(interest)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        interests.includes(interest)
-                          ? 'bg-amber-500 text-slate-900'
-                          : 'bg-slate-700 text-gray-300 hover:bg-slate-600 border border-slate-600'
-                      }`}
-                    >
-                      {interest}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                onClick={handleSavePreferences}
-                disabled={!major || interests.length === 0}
-                className="w-full py-4 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Start Exploring
-              </button>
-            </div>
-          )}
 
           {/* Build Profile - Step 1: Education */}
           {step === 'build-profile-1' && (
@@ -521,6 +500,74 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
               >
                 {isAnalyzingProfile ? 'Analyzing Your Profile...' : 'Build My Profile'}
               </button>
+            </div>
+          )}
+
+          {/* CV Builder Chatbot */}
+          {step === 'create-cv-chat' && (
+            <div className="space-y-4">
+              <button
+                onClick={() => setStep('choice')}
+                className="text-amber-400 hover:text-amber-300 text-sm flex items-center gap-2"
+              >
+                ← Back
+              </button>
+
+              <div className="mb-4">
+                <h3 className="text-2xl font-bold text-white mb-2">Create Your ATS-Friendly CV</h3>
+                <p className="text-gray-300 text-sm">Chat with our AI assistant to build a professional CV that gets past Applicant Tracking Systems</p>
+              </div>
+
+              {/* Chat Messages */}
+              <div className="bg-slate-900 rounded-lg p-4 h-[400px] overflow-y-auto space-y-4">
+                {cvChatMessages.map((msg, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-[80%] rounded-lg p-3 ${
+                        msg.role === 'user'
+                          ? 'bg-amber-500 text-slate-900'
+                          : 'bg-slate-700 text-white'
+                      }`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    </div>
+                  </div>
+                ))}
+                {isChatLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-slate-700 text-white rounded-lg p-3">
+                      <p className="text-sm">Typing...</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Chat Input */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={cvChatInput}
+                  onChange={(e) => setCvChatInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleCvChatSubmit()}
+                  placeholder="Type your response..."
+                  className="flex-1 px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500"
+                  disabled={isChatLoading}
+                />
+                <button
+                  onClick={handleCvChatSubmit}
+                  disabled={isChatLoading || !cvChatInput.trim()}
+                  className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Send
+                </button>
+              </div>
+
+              <div className="text-xs text-gray-400 text-center">
+                Tip: Be specific about your achievements and use action verbs. Our AI will format everything for ATS optimization.
+              </div>
             </div>
           )}
         </div>
