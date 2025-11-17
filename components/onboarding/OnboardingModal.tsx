@@ -15,6 +15,7 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
   const [step, setStep] = useState<'choice' | 'upload' | 'preferences'>('choice');
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   // Preferences form
   const [major, setMajor] = useState('');
@@ -38,6 +39,8 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
     if (!file) return;
 
     setIsUploading(true);
+    setUploadError('');
+
     try {
       const formData = new FormData();
       formData.append('cv', file);
@@ -49,6 +52,11 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
 
       const data = await response.json();
 
+      if (data.error) {
+        setUploadError(data.error + (data.details ? `: ${data.details}` : ''));
+        return;
+      }
+
       if (data.analysis) {
         saveUserProfile({
           cvText: data.cvText,
@@ -56,16 +64,18 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
           cvUploadedAt: new Date().toISOString(),
           skills: data.analysis.skills || [],
           careerLevel: data.analysis.careerLevel || 'entry',
-          aiSummary: data.analysis.summary || '',
+          aiSummary: data.analysis.summary || data.analysis,
           recommendedJobIds: data.analysis.recommendedJobIds || [],
         });
 
         onClose();
-        window.location.reload(); // Refresh to show personalized content
+        window.location.reload();
+      } else {
+        setUploadError('No analysis data received from server');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload error:', error);
-      alert('Failed to analyze CV. Please try again.');
+      setUploadError(error.message || 'Failed to analyze CV. Please try again.');
     } finally {
       setIsUploading(false);
     }
@@ -195,6 +205,12 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
                   onChange={handleFileChange}
                 />
               </label>
+
+              {uploadError && (
+                <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4">
+                  <p className="text-red-400 text-sm">{uploadError}</p>
+                </div>
+              )}
 
               {file && (
                 <button

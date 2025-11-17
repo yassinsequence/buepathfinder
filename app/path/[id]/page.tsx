@@ -1,14 +1,15 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, TrendingUp, Briefcase } from 'lucide-react';
 import { careerPaths } from '@/lib/data/career-paths';
 import { egyptianCareers } from '@/lib/data/egyptian-careers';
+import { getUserProfile } from '@/lib/storage/userProfile';
 import PathCard from '@/components/explorer/PathCard';
 import { CareerPath } from '@/types';
 
-function convertToCareerPath(career: any): CareerPath {
+function convertToCareerPath(career: any, userSkills: string[] = []): CareerPath {
   return {
     id: career.id,
     title: career.title,
@@ -23,7 +24,10 @@ function convertToCareerPath(career: any): CareerPath {
       id: `${career.id}-skill-${index}`,
       name: skill,
       category: 'General',
-      userHasSkill: false,
+      userHasSkill: userSkills.some(userSkill =>
+        skill.toLowerCase().includes(userSkill.toLowerCase()) ||
+        userSkill.toLowerCase().includes(skill.toLowerCase())
+      ),
     })),
     recommendedMajors: career.recommendedMajors,
     description: career.description,
@@ -40,6 +44,12 @@ function convertToCareerPath(career: any): CareerPath {
 export default function PathDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [filter, setFilter] = useState<'all' | 'job' | 'postgraduate'>('all');
+  const [userSkills, setUserSkills] = useState<string[]>([]);
+
+  useEffect(() => {
+    const profile = getUserProfile();
+    setUserSkills(profile?.skills || []);
+  }, []);
 
   const path = careerPaths.find((p) => p.id === id);
 
@@ -56,10 +66,10 @@ export default function PathDetailPage({ params }: { params: Promise<{ id: strin
     );
   }
 
-  // Get all opportunities for this path
+  // Get all opportunities for this path with user skills for matching
   const pathOpportunities = egyptianCareers
     .filter((career) => path.relatedJobIds.includes(career.id))
-    .map(convertToCareerPath);
+    .map(career => convertToCareerPath(career, userSkills));
 
   // Apply filter
   const filteredOpportunities =

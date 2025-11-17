@@ -113,25 +113,19 @@ export default function ExplorePage() {
       <div className="fixed bottom-8 right-8 flex flex-col gap-3 z-40">
         <Link
           href="/chat"
-          className="group flex items-center gap-2 bg-slate-800 border border-slate-700 text-white px-5 py-3 rounded-lg shadow-lg hover:bg-slate-700 hover:border-amber-500 transition-all"
+          className="flex items-center justify-center w-14 h-14 bg-slate-800 border border-slate-700 text-white rounded-xl shadow-lg hover:bg-slate-700 hover:border-amber-500 transition-colors"
           title="Chat with AI"
         >
-          <MessageCircle className="w-5 h-5" />
-          <span className="font-medium max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300">
-            Chat with AI
-          </span>
+          <MessageCircle className="w-6 h-6" />
         </Link>
 
         {!userHasProfile && (
           <button
             onClick={() => setShowOnboarding(true)}
-            className="group flex items-center gap-2 bg-amber-500 text-slate-900 px-5 py-3 rounded-lg shadow-lg hover:bg-amber-400 transition-all"
+            className="flex items-center justify-center w-14 h-14 bg-amber-500 text-slate-900 rounded-xl shadow-lg hover:bg-amber-400 transition-colors"
             title="Upload CV"
           >
-            <Upload className="w-5 h-5" />
-            <span className="font-medium max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300">
-              Upload CV
-            </span>
+            <Upload className="w-6 h-6" />
           </button>
         )}
       </div>
