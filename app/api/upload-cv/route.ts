@@ -11,7 +11,8 @@ async function extractTextFromFile(file: File): Promise<string> {
   if (file.name.endsWith('.pdf')) {
     try {
       // Dynamic import for pdf-parse to avoid build issues
-      const pdfParse = (await import('pdf-parse')).default;
+      const pdfModule = await import('pdf-parse');
+      const pdfParse = (pdfModule as any).default || pdfModule;
       const data = await pdfParse(buffer);
       return data.text;
     } catch (error) {
