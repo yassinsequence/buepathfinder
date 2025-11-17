@@ -34,29 +34,8 @@ async function extractTextFromFile(file: File): Promise<string> {
   const buffer = Buffer.from(arrayBuffer);
 
   if (file.name.endsWith('.pdf')) {
-    try {
-      // Try dynamic import for pdf-parse first
-      const pdfModule = await import('pdf-parse');
-      const pdfParse = (pdfModule as any).default || pdfModule;
-      const data = await pdfParse(buffer);
-
-      if (data.text && data.text.trim().length > 0) {
-        return data.text;
-      }
-
-      // If pdf-parse returns empty text, fall back to Gemini
-      console.log('pdf-parse returned empty text, trying Gemini...');
-      return await extractTextFromPDFWithGemini(buffer);
-    } catch (error: any) {
-      console.error('PDF parsing error, falling back to Gemini:', error.message);
-
-      // Fallback to Gemini's multimodal capability
-      try {
-        return await extractTextFromPDFWithGemini(buffer);
-      } catch (geminiError: any) {
-        throw new Error('Could not extract text from PDF. Please try converting to DOCX or TXT format.');
-      }
-    }
+    // Use Gemini directly for PDF parsing - most reliable method
+    return await extractTextFromPDFWithGemini(buffer);
   } else if (file.name.endsWith('.docx')) {
     try {
       const result = await mammoth.extractRawText({ buffer });
