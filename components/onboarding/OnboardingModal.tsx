@@ -12,7 +12,7 @@ interface OnboardingModalProps {
 
 export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
   const router = useRouter();
-  const [step, setStep] = useState<'choice' | 'upload' | 'preferences'>('choice');
+  const [step, setStep] = useState<'choice' | 'upload' | 'preferences' | 'build-profile-1' | 'build-profile-2' | 'build-profile-3'>('choice');
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
@@ -21,6 +21,11 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
   const [major, setMajor] = useState('');
   const [interests, setInterests] = useState<string[]>([]);
   const [experienceLevel, setExperienceLevel] = useState('entry');
+
+  // Build Profile form
+  const [educationStory, setEducationStory] = useState('');
+  const [experienceStory, setExperienceStory] = useState('');
+  const [isAnalyzingProfile, setIsAnalyzingProfile] = useState(false);
 
   const availableInterests = [
     'Software Development', 'Data Science', 'Mechanical Engineering', 'Civil Engineering',
@@ -111,6 +116,58 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
     );
   };
 
+  const handleAnalyzeProfile = async () => {
+    setIsAnalyzingProfile(true);
+    setUploadError('');
+
+    try {
+      const response = await fetch('/api/analyze-profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          education: educationStory,
+          experience: experienceStory,
+          interests: interests,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        setUploadError(data.error);
+        return;
+      }
+
+      if (data.analysis) {
+        saveUserProfile({
+          cvText: `Education: ${educationStory}\n\nExperience: ${experienceStory}\n\nInterests: ${interests.join(', ')}`,
+          cvFileName: 'Built Profile',
+          cvUploadedAt: new Date().toISOString(),
+          skills: data.analysis.skills || [],
+          careerLevel: data.analysis.careerLevel || 'entry',
+          aiSummary: data.analysis.summary || '',
+          recommendedJobIds: data.analysis.recommendedJobIds || [],
+          interests: interests,
+          major: data.analysis.major || '',
+          experience: data.analysis.experience || [],
+          careerPaths: data.analysis.careerPaths || [],
+        });
+
+        onClose();
+        window.location.reload();
+      } else {
+        setUploadError('No analysis data received from server');
+      }
+    } catch (error: any) {
+      console.error('Profile analysis error:', error);
+      setUploadError(error.message || 'Failed to analyze profile. Please try again.');
+    } finally {
+      setIsAnalyzingProfile(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
       <div className="bg-slate-800 border border-slate-700 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -148,6 +205,23 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
                       <h4 className="text-xl font-bold text-white mb-2">Upload Your CV</h4>
                       <p className="text-gray-300">
                         Get AI-powered analysis and personalized recommendations based on your experience
+                      </p>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setStep('build-profile-1')}
+                  className="group bg-slate-700 hover:bg-slate-600 border-2 border-slate-600 hover:border-amber-500 rounded-xl p-6 transition-all text-left"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-amber-500/20 rounded-lg">
+                      <FileText className="w-6 h-6 text-amber-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xl font-bold text-white mb-2">Build Your Profile</h4>
+                      <p className="text-gray-300">
+                        Share your story - we'll extract your skills and match you to the best paths
                       </p>
                     </div>
                   </div>
@@ -303,6 +377,149 @@ export default function OnboardingModal({ isOpen, onClose }: OnboardingModalProp
                 className="w-full py-4 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Start Exploring
+              </button>
+            </div>
+          )}
+
+          {/* Build Profile - Step 1: Education */}
+          {step === 'build-profile-1' && (
+            <div className="space-y-6">
+              <button
+                onClick={() => setStep('choice')}
+                className="text-amber-400 hover:text-amber-300 text-sm flex items-center gap-2"
+              >
+                ← Back
+              </button>
+
+              <div className="mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-3 py-1 bg-amber-500/20 text-amber-400 rounded-full text-sm font-medium">Step 1 of 3</span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">Tell us about your education</h3>
+                <p className="text-gray-300 text-sm">Share your academic journey, what you're studying, and what excites you about your field</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Your Education Story
+                </label>
+                <textarea
+                  value={educationStory}
+                  onChange={(e) => setEducationStory(e.target.value)}
+                  placeholder="Example: I'm a third-year Mechanical Engineering student at BUE. I've always been fascinated by how things work, and I love working on design projects. I've taken courses in thermodynamics, CAD design, and manufacturing processes. My senior project focuses on renewable energy systems..."
+                  rows={8}
+                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500 resize-none"
+                />
+                <p className="text-gray-400 text-xs mt-2">
+                  {educationStory.length} characters • Minimum 100 characters recommended
+                </p>
+              </div>
+
+              <button
+                onClick={() => setStep('build-profile-2')}
+                disabled={educationStory.length < 50}
+                className="w-full py-4 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Continue to Experience
+              </button>
+            </div>
+          )}
+
+          {/* Build Profile - Step 2: Experience */}
+          {step === 'build-profile-2' && (
+            <div className="space-y-6">
+              <button
+                onClick={() => setStep('build-profile-1')}
+                className="text-amber-400 hover:text-amber-300 text-sm flex items-center gap-2"
+              >
+                ← Back
+              </button>
+
+              <div className="mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-3 py-1 bg-amber-500/20 text-amber-400 rounded-full text-sm font-medium">Step 2 of 3</span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">Share your experience</h3>
+                <p className="text-gray-300 text-sm">Tell us about internships, projects, volunteer work, or any relevant experience</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Your Experience Story
+                </label>
+                <textarea
+                  value={experienceStory}
+                  onChange={(e) => setExperienceStory(e.target.value)}
+                  placeholder="Example: Last summer, I interned at Siemens Egypt where I worked on automation systems. I helped design and test control circuits for industrial machinery. I also built a small solar-powered device for my university's innovation competition. I'm comfortable with SolidWorks and AutoCAD from my coursework..."
+                  rows={8}
+                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-amber-500 resize-none"
+                />
+                <p className="text-gray-400 text-xs mt-2">
+                  {experienceStory.length} characters • If you don't have work experience, share projects or coursework
+                </p>
+              </div>
+
+              <button
+                onClick={() => setStep('build-profile-3')}
+                disabled={experienceStory.length < 30}
+                className="w-full py-4 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Continue to Interests
+              </button>
+            </div>
+          )}
+
+          {/* Build Profile - Step 3: Interests */}
+          {step === 'build-profile-3' && (
+            <div className="space-y-6">
+              <button
+                onClick={() => setStep('build-profile-2')}
+                className="text-amber-400 hover:text-amber-300 text-sm flex items-center gap-2"
+              >
+                ← Back
+              </button>
+
+              <div className="mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-3 py-1 bg-amber-500/20 text-amber-400 rounded-full text-sm font-medium">Step 3 of 3</span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2">What interests you?</h3>
+                <p className="text-gray-300 text-sm">Select all career areas that interest you</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-3">
+                  Your Career Interests (select at least 2)
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {availableInterests.map((interest) => (
+                    <button
+                      key={interest}
+                      onClick={() => toggleInterest(interest)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        interests.includes(interest)
+                          ? 'bg-amber-500 text-slate-900'
+                          : 'bg-slate-700 text-gray-300 hover:bg-slate-600 border border-slate-600'
+                      }`}
+                    >
+                      {interest}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {uploadError && (
+                <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4">
+                  <p className="text-red-400 text-sm">{uploadError}</p>
+                </div>
+              )}
+
+              <button
+                onClick={handleAnalyzeProfile}
+                disabled={interests.length < 2 || isAnalyzingProfile}
+                className="w-full py-4 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isAnalyzingProfile ? 'Analyzing Your Profile...' : 'Build My Profile'}
               </button>
             </div>
           )}
