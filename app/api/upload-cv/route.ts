@@ -4,28 +4,66 @@ import mammoth from 'mammoth';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
+async function extractTextFromPDFWithGemini(buffer: Buffer): Promise<string> {
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+    // Convert PDF buffer to base64
+    const base64Data = buffer.toString('base64');
+
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          data: base64Data,
+          mimeType: 'application/pdf'
+        }
+      },
+      'Extract all text content from this CV/Resume PDF. Return only the raw text, preserving the structure and formatting as much as possible.'
+    ]);
+
+    const text = result.response.text();
+    return text;
+  } catch (error: any) {
+    console.error('Gemini PDF extraction error:', error);
+    throw new Error('Failed to extract text from PDF using AI');
+  }
+}
+
 async function extractTextFromFile(file: File): Promise<string> {
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
   if (file.name.endsWith('.pdf')) {
     try {
-      // Dynamic import for pdf-parse to avoid build issues
+      // Try dynamic import for pdf-parse first
       const pdfModule = await import('pdf-parse');
       const pdfParse = (pdfModule as any).default || pdfModule;
       const data = await pdfParse(buffer);
-      return data.text;
-    } catch (error) {
-      console.error('PDF parsing error:', error);
-      throw new Error('Failed to parse PDF file');
+
+      if (data.text && data.text.trim().length > 0) {
+        return data.text;
+      }
+
+      // If pdf-parse returns empty text, fall back to Gemini
+      console.log('pdf-parse returned empty text, trying Gemini...');
+      return await extractTextFromPDFWithGemini(buffer);
+    } catch (error: any) {
+      console.error('PDF parsing error, falling back to Gemini:', error.message);
+
+      // Fallback to Gemini's multimodal capability
+      try {
+        return await extractTextFromPDFWithGemini(buffer);
+      } catch (geminiError: any) {
+        throw new Error('Could not extract text from PDF. Please try converting to DOCX or TXT format.');
+      }
     }
   } else if (file.name.endsWith('.docx')) {
     try {
       const result = await mammoth.extractRawText({ buffer });
       return result.value;
-    } catch (error) {
+    } catch (error: any) {
       console.error('DOCX parsing error:', error);
-      throw new Error('Failed to parse DOCX file');
+      throw new Error(`DOCX parsing failed: ${error.message}`);
     }
   } else if (file.name.endsWith('.doc')) {
     // .doc files are harder to parse, try as text
