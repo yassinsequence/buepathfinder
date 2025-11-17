@@ -45,11 +45,32 @@ export default function PathDetailPage({ params }: { params: Promise<{ id: strin
   const { id } = use(params);
   const [filter, setFilter] = useState<'all' | 'job' | 'postgraduate'>('all');
   const [userSkills, setUserSkills] = useState<string[]>([]);
+  const [liveJobs, setLiveJobs] = useState<any[]>([]);
+  const [isLoadingJobs, setIsLoadingJobs] = useState(true);
 
   useEffect(() => {
     const profile = getUserProfile();
     setUserSkills(profile?.skills || []);
   }, []);
+
+  useEffect(() => {
+    // Fetch live jobs
+    const fetchLiveJobs = async () => {
+      try {
+        const response = await fetch(`/api/scrape-jobs?pathId=${id}`);
+        const data = await response.json();
+        if (data.jobs) {
+          setLiveJobs(data.jobs);
+        }
+      } catch (error) {
+        console.error('Failed to fetch live jobs:', error);
+      } finally {
+        setIsLoadingJobs(false);
+      }
+    };
+
+    fetchLiveJobs();
+  }, [id]);
 
   const path = careerPaths.find((p) => p.id === id);
 
@@ -66,10 +87,13 @@ export default function PathDetailPage({ params }: { params: Promise<{ id: strin
     );
   }
 
-  // Get all opportunities for this path with user skills for matching
-  const pathOpportunities = egyptianCareers
+  // Get static opportunities for this path with user skills for matching
+  const staticOpportunities = egyptianCareers
     .filter((career) => path.relatedJobIds.includes(career.id))
     .map(career => convertToCareerPath(career, userSkills));
+
+  // Combine static and live jobs
+  const pathOpportunities = staticOpportunities;
 
   // Apply filter
   const filteredOpportunities =
@@ -179,6 +203,43 @@ export default function PathDetailPage({ params }: { params: Promise<{ id: strin
               Programs ({pathOpportunities.filter((o) => o.type === 'postgraduate').length})
             </button>
           </div>
+        </div>
+
+        {/* Live Jobs Section */}
+        {!isLoadingJobs && liveJobs.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-2xl font-bold text-white">Live Job Listings</h2>
+              <span className="px-3 py-1 bg-green-500/20 text-green-400 text-sm rounded-full border border-green-500/30">
+                Updated Recently
+              </span>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {liveJobs.slice(0, 9).map((job, index) => (
+                <a
+                  key={`${job.source}-${index}`}
+                  href={job.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-slate-800 border border-slate-700 hover:border-amber-500 rounded-lg p-4 transition-all"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-white font-semibold text-sm line-clamp-2">{job.title}</h3>
+                    <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded shrink-0 ml-2">
+                      {job.source}
+                    </span>
+                  </div>
+                  <p className="text-gray-400 text-sm mb-1">{job.company}</p>
+                  <p className="text-gray-500 text-xs">{job.location}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Curated Opportunities */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-white mb-4">Curated Opportunities</h2>
         </div>
 
         {/* Opportunities Grid */}
