@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import pdf from 'pdf-parse';
+import * as pdfParse from 'pdf-parse';
 import mammoth from 'mammoth';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
@@ -11,7 +11,7 @@ async function extractTextFromFile(file: File): Promise<string> {
 
   if (file.name.endsWith('.pdf')) {
     try {
-      const data = await pdf(buffer);
+      const data = await pdfParse.default(buffer);
       return data.text;
     } catch (error) {
       console.error('PDF parsing error:', error);
