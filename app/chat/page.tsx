@@ -53,9 +53,9 @@ export default function ChatPage() {
     }
   ];
 
-  const getModeColor = (m: ChatMode) => {
+  const getModeColor = (m: ChatMode): 'blue' | 'green' | 'purple' | 'amber' => {
     const modeConfig = modes.find(mo => mo.id === m);
-    return modeConfig?.color || 'blue';
+    return (modeConfig?.color as 'blue' | 'green' | 'purple' | 'amber') || 'blue';
   };
 
   const handleModeChange = (newMode: ChatMode) => {
