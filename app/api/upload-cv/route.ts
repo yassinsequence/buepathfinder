@@ -7,9 +7,9 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
     // Use Gemini Flash for PDF text extraction
-    // gemini-1.5-flash-latest is the stable model that supports PDFs
+    // gemini-1.5-flash supports multimodal input including PDFs
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash-latest',
+      model: 'gemini-1.5-flash',
     });
 
     const base64Data = buffer.toString('base64');
