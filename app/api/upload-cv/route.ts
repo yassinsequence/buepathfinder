@@ -11,9 +11,9 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
-    // Use gemini-pro-vision which supports multimodal (images/docs)
+    // Use gemini-2.0-flash (Gemini 1.x models are retired as of 2025)
     const model = genAI.getGenerativeModel({
-      model: "gemini-pro-vision"
+      model: "gemini-2.0-flash-exp"
     });
 
     const result = await model.generateContent([
