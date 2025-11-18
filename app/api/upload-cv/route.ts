@@ -6,34 +6,24 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
-    // Use Gemini Flash for PDF text extraction
-    // gemini-1.5-flash supports multimodal input including PDFs
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: "gemini-1.5-pro"
     });
-
-    const base64Data = buffer.toString('base64');
 
     const result = await model.generateContent([
       {
         inlineData: {
-          data: base64Data,
-          mimeType: 'application/pdf'
+          mimeType: "application/pdf",
+          data: buffer.toString('base64')
         }
       },
-      'Extract all text from this PDF. Return only the text content, preserving structure. Include all sections.'
+      "Extract all text from this PDF CV/Resume. Return only the text content."
     ]);
 
-    const text = result.response.text();
-
-    if (!text || text.trim().length === 0) {
-      throw new Error('No text extracted from PDF');
-    }
-
-    return text;
+    return result.response.text();
   } catch (error: any) {
     console.error('PDF extraction error:', error);
-    throw new Error(`Failed to read PDF: ${error.message || 'Could not parse PDF'}`);
+    throw new Error(`Failed to extract PDF: ${error.message}`);
   }
 }
 
@@ -42,7 +32,6 @@ async function extractTextFromFile(file: File): Promise<string> {
   const buffer = Buffer.from(arrayBuffer);
 
   if (file.name.endsWith('.pdf')) {
-    // Use Gemini AI for PDF text extraction (serverless-compatible)
     return await extractTextFromPDF(buffer);
   } else if (file.name.endsWith('.docx')) {
     try {
