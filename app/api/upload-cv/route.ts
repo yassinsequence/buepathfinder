@@ -7,7 +7,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 async function extractTextFromPDFWithGemini(buffer: Buffer): Promise<string> {
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-pro',
+      model: 'gemini-1.5-flash',
       generationConfig: {
         temperature: 0.1,
       }
