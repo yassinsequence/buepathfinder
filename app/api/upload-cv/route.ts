@@ -1,51 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import mammoth from 'mammoth';
+import pdfParse from 'pdf-parse';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
-async function extractTextFromPDFWithGemini(buffer: Buffer): Promise<string> {
+async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash-exp',
-      generationConfig: {
-        temperature: 0.1,
-      }
-    });
+    const data = await pdfParse(buffer);
 
-    // Convert PDF buffer to base64
-    const base64Data = buffer.toString('base64');
-
-    const result = await model.generateContent([
-      {
-        inlineData: {
-          data: base64Data,
-          mimeType: 'application/pdf'
-        }
-      },
-      'Extract all text content from this CV/Resume PDF. Return only the raw text content, preserving the structure and formatting as much as possible. Include all sections like education, experience, skills, etc.'
-    ]);
-
-    const response = result.response;
-    const text = response.text();
-
-    if (!text || text.trim().length === 0) {
+    if (!data.text || data.text.trim().length === 0) {
       throw new Error('No text extracted from PDF');
     }
 
-    return text;
+    return data.text;
   } catch (error: any) {
-    console.error('Gemini PDF extraction error:', error);
-    console.error('Error details:', error.message);
-
-    // More specific error message
-    if (error.message?.includes('API key')) {
-      throw new Error('API configuration error. Please contact support.');
-    } else if (error.message?.includes('quota')) {
-      throw new Error('Service temporarily unavailable. Please try again later.');
-    } else {
-      throw new Error(`Failed to read PDF: ${error.message || 'Unknown error'}`);
-    }
+    console.error('PDF parsing error:', error);
+    throw new Error(`Failed to read PDF: ${error.message || 'Unknown error'}`);
   }
 }
 
@@ -54,8 +25,8 @@ async function extractTextFromFile(file: File): Promise<string> {
   const buffer = Buffer.from(arrayBuffer);
 
   if (file.name.endsWith('.pdf')) {
-    // Use Gemini directly for PDF parsing - most reliable method
-    return await extractTextFromPDFWithGemini(buffer);
+    // Use pdf-parse library for reliable PDF text extraction
+    return await extractTextFromPDF(buffer);
   } else if (file.name.endsWith('.docx')) {
     try {
       const result = await mammoth.extractRawText({ buffer });
