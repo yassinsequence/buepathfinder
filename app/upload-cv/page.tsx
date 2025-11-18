@@ -38,7 +38,7 @@ export default function UploadCVPage() {
       const data = await response.json();
 
       if (data.analysis) {
-        // Save to localStorage
+        // Save to localStorage - save ALL fields from AI analysis
         saveUserProfile({
           cvText: data.cvText,
           cvFileName: data.fileName,
@@ -47,6 +47,10 @@ export default function UploadCVPage() {
           careerLevel: data.analysis.careerLevel || 'entry',
           aiSummary: data.analysis.summary || '',
           recommendedJobIds: data.analysis.recommendedJobIds || [],
+          interests: data.analysis.interests || [],
+          major: data.analysis.major || '',
+          experience: data.analysis.experience || [],
+          careerPaths: data.analysis.careerPaths || [],
         });
 
         setSummary(data.analysis.summary || data.analysis);
