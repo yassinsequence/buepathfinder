@@ -4,20 +4,26 @@ import mammoth from 'mammoth';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
+// Available models that actually work:
+// - models/gemini-pro (text only)
+// - models/gemini-pro-vision (multimodal - images)
+// For PDFs, we'll use vision model or 2.0 flash
+
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
+    // Use gemini-pro-vision which supports multimodal (images/docs)
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-pro"
+      model: "gemini-pro-vision"
     });
 
     const result = await model.generateContent([
+      "Extract all text from this PDF CV/Resume. Return only the text content, preserving structure.",
       {
         inlineData: {
           mimeType: "application/pdf",
           data: buffer.toString('base64')
         }
-      },
-      "Extract all text from this PDF CV/Resume. Return only the text content."
+      }
     ]);
 
     return result.response.text();
