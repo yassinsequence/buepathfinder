@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Home, FileText, Briefcase, TrendingUp, X } from 'lucide-react';
+import { Home, FileText, Briefcase, TrendingUp, X, GraduationCap } from 'lucide-react';
 import { getUserProfile, clearUserProfile, type UserProfile } from '@/lib/storage/userProfile';
 import { egyptianCareers } from '@/lib/data/egyptian-careers';
+import LearningPathGenerator from '@/components/learning/LearningPathGenerator';
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -117,6 +118,22 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+
+        {/* Learning Path Section */}
+        {profile && recommendedJobs.length > 0 && (
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <GraduationCap className="w-6 h-6 text-amber-500" />
+              <h3 className="text-xl font-bold text-white">My Learning Path</h3>
+            </div>
+            <LearningPathGenerator
+              userSkills={profile.skills}
+              targetRole={recommendedJobs[0]?.title || 'Your Dream Career'}
+              requiredSkills={recommendedJobs[0]?.requiredSkills || []}
+              userLevel={profile.careerLevel}
+            />
+          </div>
+        )}
 
         {/* Recommended Jobs Section */}
         {profile && recommendedJobs.length > 0 && (

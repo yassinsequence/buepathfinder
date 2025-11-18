@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Briefcase, MapPin, Building2, TrendingUp, Clock, DollarSign, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Briefcase, MapPin, Building2, TrendingUp, Clock, DollarSign, ExternalLink, GraduationCap } from 'lucide-react';
 import { careerSectors, type CareerFunction } from '@/lib/data/career-sectors';
 import { egyptianCareers, type CareerOpportunity } from '@/lib/data/egyptian-careers';
+import { getUserProfile } from '@/lib/storage/userProfile';
+import LearningPathGenerator from '@/components/learning/LearningPathGenerator';
 
 export default function FunctionDetailPage() {
   const params = useParams();
@@ -15,6 +17,7 @@ export default function FunctionDetailPage() {
 
   const [functionData, setFunctionData] = useState<CareerFunction | null>(null);
   const [relatedJobs, setRelatedJobs] = useState<CareerOpportunity[]>([]);
+  const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
     const sector = careerSectors.find(s => s.id === sectorId);
@@ -28,6 +31,10 @@ export default function FunctionDetailPage() {
         setRelatedJobs(jobs);
       }
     }
+
+    // Get user profile for learning path personalization
+    const profile = getUserProfile();
+    setUserProfile(profile);
   }, [sectorId, functionId]);
 
   if (!functionData) {
@@ -169,6 +176,23 @@ export default function FunctionDetailPage() {
               </ul>
             </div>
           </div>
+        </div>
+
+        {/* Learning Path Generator */}
+        <div className="mb-12 bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <GraduationCap className="w-6 h-6 text-amber-500" />
+            <h2 className="text-2xl font-bold text-white">Your Learning Path to {functionData.name}</h2>
+          </div>
+          <p className="text-gray-400 mb-6">
+            Get a personalized roadmap to develop the skills you need for this role
+          </p>
+          <LearningPathGenerator
+            userSkills={userProfile?.skills || []}
+            targetRole={functionData.name}
+            requiredSkills={functionData.requiredSkills}
+            userLevel={userProfile?.careerLevel || 'entry'}
+          />
         </div>
 
         {/* Related Jobs */}
