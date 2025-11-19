@@ -108,21 +108,38 @@ Provide a response in this EXACT JSON format (no markdown, just pure JSON):
 }
 
 IMPORTANT INSTRUCTIONS:
-1. Extract 8-15 specific technical and soft skills from their CV
-2. Include their academic major/field of study
-3. List 5-8 career interests/domains based on their experience and education
-4. List all work experiences or internships
+1. Extract 8-15 specific technical and soft skills from their CV (be precise - extract actual skills mentioned, not generic ones)
+2. Include their academic major/field of study EXACTLY as written (e.g., "Computer Science", "Mechanical Engineering", "Business Administration")
+3. List 5-8 career interests/domains based on their experience and education (what fields they've shown interest in)
+4. List all work experiences or internships with company names and roles
 5. For careerPaths, select 2-4 most relevant from: software-tech, industrial-engineering, sustainability, business-finance, media-marketing, creative-design, research-education, legal-compliance, healthcare-clinical, pharma-biotech, rehabilitation
-6. For recommendedJobIds, select 4-8 most relevant from:
-   - Engineering: mech-1, mech-2, civil-1, elec-1, eng-1, eng-2, eng-3, eng-4, eng-5, eng-6
-   - Energy: energy-1, energy-2, energy-3
-   - Business: bus-1, bus-2, bus-3, bus-4
-   - Creative: cre-1, cre-2, cre-3, cre-4
-   - Medical: med-1, med-2, pharm-1, pharm-2, dent-1, nurs-1, physio-1
-   - Law: law-1, law-2, law-3, law-4
-   - Marketing: mar-1, mar-2, mar-3
 
-Be specific and extract real information from the CV, not generic placeholders.`;
+6. For recommendedJobIds - THIS IS CRITICAL - select 4-8 jobs that BEST MATCH their:
+   - Academic major (prioritize jobs in their field of study)
+   - Actual skills listed in CV (technical skills, languages, tools)
+   - Work experience level (entry/mid/senior)
+   - Career interests and demonstrated passions
+
+   Available job IDs by category:
+   - Engineering & Tech: eng-1 (Software Engineer), eng-2 (Data Analyst), eng-3 (Cybersecurity Analyst), eng-4 (AI/ML Engineer), eng-5 (DevOps Engineer), eng-6 (Cloud Solutions Architect), mech-1 (Mechanical Engineer), mech-2 (Automotive Engineer), civil-1 (Civil Engineer), elec-1 (Electrical Engineer)
+   - Energy & Sustainability: energy-1 (Renewable Energy Engineer), energy-2 (Energy Analyst), energy-3 (Sustainability Consultant)
+   - Business & Finance: bus-1 (Financial Analyst), bus-2 (Management Consultant), bus-3 (Investment Banking Analyst), bus-4 (Business Development Manager)
+   - Creative & Design: cre-1 (UX/UI Designer), cre-2 (Graphic Designer), cre-3 (Content Creator), cre-4 (Brand Manager)
+   - Medical & Healthcare: med-1 (Medical Doctor), med-2 (Clinical Research Associate), pharm-1 (Pharmacist), pharm-2 (Pharmaceutical Researcher), dent-1 (Dentist), nurs-1 (Registered Nurse), physio-1 (Physiotherapist)
+   - Law & Legal: law-1 (Corporate Lawyer), law-2 (Legal Consultant), law-3 (Compliance Officer), law-4 (Paralegal)
+   - Marketing & Sales: mar-1 (Digital Marketing Specialist), mar-2 (Sales Manager), mar-3 (Marketing Analyst)
+
+MATCHING LOGIC:
+- If major is Computer Science/Software Engineering → prioritize eng-1, eng-3, eng-4, eng-5, eng-6
+- If major is Mechanical/Automotive Engineering → prioritize mech-1, mech-2, eng-5
+- If major is Business/Finance → prioritize bus-1, bus-2, bus-3, bus-4
+- If major is Medicine/Healthcare → prioritize med-1, med-2, pharm-1, nurs-1
+- If major is Law → prioritize law-1, law-2, law-3
+- If they have design/creative skills → include cre-1, cre-2, cre-4
+- If they have marketing/communication skills → include mar-1, mar-3
+- Match experience level: entry-level students get entry jobs, experienced candidates get senior roles
+
+Be specific and extract real information from the CV, not generic placeholders. The job recommendations should make sense for this person's background.`;
 
     const result = await model.generateContent(prompt);
     const response = result.response;

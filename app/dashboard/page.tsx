@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Home, FileText, Briefcase, TrendingUp, X, GraduationCap } from 'lucide-react';
+import { Home, FileText, Briefcase, TrendingUp, X, GraduationCap, Target } from 'lucide-react';
 import { getUserProfile, clearUserProfile, type UserProfile } from '@/lib/storage/userProfile';
 import { egyptianCareers } from '@/lib/data/egyptian-careers';
 import LearningPathGenerator from '@/components/learning/LearningPathGenerator';
+import { rankJobsByMatch, getMatchColor, getMatchLabel } from '@/lib/utils/matchScore';
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -21,8 +22,12 @@ export default function DashboardPage() {
     }
   };
 
+  // Get recommended jobs with match scores and sort by relevance
   const recommendedJobs = profile?.recommendedJobIds
-    ? egyptianCareers.filter(job => profile.recommendedJobIds.includes(job.id))
+    ? rankJobsByMatch(
+        egyptianCareers.filter(job => profile.recommendedJobIds.includes(job.id)),
+        profile
+      )
     : [];
 
   return (
@@ -149,14 +154,32 @@ export default function DashboardPage() {
                   key={job.id}
                   className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 hover:border-amber-500/50 transition-all"
                 >
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-semibold text-white">{job.title}</h4>
-                    <span className="px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded">
+                  <div className="flex items-start justify-between mb-3">
+                    <h4 className="font-semibold text-white flex-1">{job.title}</h4>
+                    <span className="px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded ml-2">
                       {job.type}
                     </span>
                   </div>
+
+                  {/* Match Score Badge */}
+                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold mb-3 border ${getMatchColor(job.matchScore.matchPercentage)}`}>
+                    <Target className="w-4 h-4" />
+                    <span>{job.matchScore.matchPercentage}% Match</span>
+                  </div>
+
                   <p className="text-amber-400 text-sm mb-2">{job.organization}</p>
                   <p className="text-gray-400 text-sm mb-3">{job.location}</p>
+
+                  {/* Skills Match Info */}
+                  <div className="mb-3">
+                    <p className="text-gray-300 text-xs mb-1">
+                      Skills: {job.matchScore.matchedSkills.length}/{job.requiredSkills.length} matched
+                    </p>
+                    {job.matchScore.majorMatch && (
+                      <p className="text-green-400 text-xs">✓ Major aligned</p>
+                    )}
+                  </div>
+
                   {job.salaryRange && (
                     <p className="text-gray-300 text-sm font-medium">
                       {job.salaryRange.min.toLocaleString()} - {job.salaryRange.max.toLocaleString()} {job.salaryRange.currency}
